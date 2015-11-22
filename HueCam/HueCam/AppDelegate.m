@@ -19,8 +19,13 @@ struct pixel {
 
 @property NSImage * currentFrame;
 @property CGImageRef currentCGFrame;
+
+@property NSImage * croppedImageFrame;
+@property CGImageRef croppedImageCGFrame;
+
 @property NSColor * currentColor;
 @property NSTimer * updateIntervalTimer;
+@property CGRect cropRect;
 
 @end
 
@@ -36,8 +41,14 @@ struct pixel {
 
 - (void) setupUI {
 	self.croppingImage.wantsLayer = TRUE;
+	self.croppingImage.layer.zPosition = 1;
 	self.croppingImage.layer.backgroundColor = [[NSColor blackColor] CGColor];
 	self.currentColorView.wantsLayer = TRUE;
+	
+	self.cropSelector.wantsLayer = TRUE;
+	self.cropSelector.layer.zPosition = 10;
+	//self.cropSelector.frame = self.croppingImage.bounds;
+	//[self.croppingImage addSubview:self.cropSelector];
 }
 
 - (void) setupCapture {
@@ -58,7 +69,7 @@ struct pixel {
 	
 	//setup input for default camera
 	NSError * error = nil;
-	AVCaptureDevice* device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+	AVCaptureDevice * device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 	AVCaptureDeviceInput * input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
 	if(error) {
 		NSLog(@"error: %@",error);
@@ -85,7 +96,7 @@ struct pixel {
 
 - (void) setupSDK {
 	self.sdk = [[PHHueSDK alloc] init];
-	[self.sdk enableLogging:TRUE];
+	//[self.sdk enableLogging:TRUE];
 	[self.sdk startUpSDK];
 	
 	if([[NSUserDefaults standardUserDefaults] boolForKey:@"BridgeConnected"]) {
@@ -158,35 +169,38 @@ struct pixel {
 #pragma mark utils
 
 - (void) updateCurrentFrameFromSampleBuffer:(CMSampleBufferRef) sampleBuffer {
-	
 	// Get a CMSampleBuffer's Core Video image buffer for the media data
 	CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+	
 	// Lock the base address of the pixel buffer
 	CVPixelBufferLockBaseAddress(imageBuffer, 0);
- 
+	
 	// Get the number of bytes per row for the pixel buffer
 	void * baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
- 
+	
 	// Get the number of bytes per row for the pixel buffer
 	size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+	
 	// Get the pixel buffer width and height
 	size_t width = CVPixelBufferGetWidth(imageBuffer);
 	size_t height = CVPixelBufferGetHeight(imageBuffer);
- 
+	
 	// Create a device-dependent RGB color space
 	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
- 
+	
 	// Create a bitmap graphics context with the sample buffer data
 	CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+	
 	// Create a Quartz image from the pixel data in the bitmap graphics context
 	CGImageRef quartzImage = CGBitmapContextCreateImage(context);
+	
 	// Unlock the pixel buffer
 	CVPixelBufferUnlockBaseAddress(imageBuffer,0);
- 
+	
 	// Free up the context and color space
 	CGContextRelease(context);
 	CGColorSpaceRelease(colorSpace);
- 
+	
 	// Create an image object from the Quartz image
 	NSImage * image = [[NSImage alloc] initWithCGImage:quartzImage size:NSMakeSize(width, height)];
 	
@@ -195,31 +209,63 @@ struct pixel {
 	
 	// Release the Quartz image
 	CGImageRelease(quartzImage);
+	
+	//get crop rect from crop selector
+	CGRect cropRect = self.cropSelector.cropRect;
+	CGFloat diffx = image.size.width / self.cropSelector.frame.size.width;
+	CGFloat diffy = image.size.height / self.cropSelector.frame.size.height;
+	cropRect.origin.x = floorf(cropRect.origin.x * diffx);
+	cropRect.origin.y = floorf(cropRect.origin.y * diffy);
+	cropRect.size.width = floorf( cropRect.size.width * diffx );
+	cropRect.size.height = floorf( cropRect.size.height * diffy );
+	
+	//crop image
+	NSImage * croppedImage = [[NSImage alloc] initWithSize:NSMakeSize(cropRect.size.width,cropRect.size.height)];
+	[croppedImage lockFocus];
+	[image drawInRect:NSMakeRect(0, 0, cropRect.size.width,cropRect.size.height) fromRect:cropRect operation:NSCompositeOverlay fraction:1];
+	[croppedImage unlockFocus];
+	self.croppedImageFrame = croppedImage;
+	
+	NSRect rect = NSMakeRect(0, 0, cropRect.size.width,cropRect.size.height);
+	self.croppedImageCGFrame = [croppedImage CGImageForProposedRect:&rect context:NULL hints:NULL];
 }
 
+static struct pixel * pixels = NULL;
+
 - (void) updateDominantColorForCurrentFrame {
+	NSImage * image = self.croppedImageFrame;
+	CGImageRef cgimage = self.croppedImageCGFrame;
+	
+	if(!pixels) {
+		pixels = (struct pixel *) calloc(1, image.size.width * image.size.height * sizeof(struct pixel));
+	}
+	
 	NSUInteger red = 0;
 	NSUInteger green = 0;
 	NSUInteger blue = 0;
-	struct pixel * pixels = (struct pixel*) calloc(1, self.currentFrame.size.width * self.currentFrame.size.height * sizeof(struct pixel));
+	
 	if(pixels != nil) {
-		CGContextRef context = CGBitmapContextCreate((void*) pixels,self.currentFrame.size.width,self.currentFrame.size.height,8,self.currentFrame.size.width * 4,CGImageGetColorSpace(self.currentCGFrame),kCGImageAlphaPremultipliedLast);
+		CGContextRef context = CGBitmapContextCreate((void*)pixels,image.size.width,image.size.height,8,image.size.width * 4,CGImageGetColorSpace(cgimage),kCGImageAlphaPremultipliedLast);
 		if(context != NULL) {
-			CGContextDrawImage(context, CGRectMake(0.0f, 0.0f, self.currentFrame.size.width, self.currentFrame.size.height), self.currentCGFrame);
-			NSUInteger numberOfPixels = self.currentFrame.size.width * self.currentFrame.size.height;
-			for (int i=0; i < numberOfPixels; i++) {
+			
+			CGContextDrawImage(context, CGRectMake(0.0f, 0.0f, image.size.width,image.size.height),cgimage);
+			NSUInteger numberOfPixels = image.size.width * image.size.height;
+			
+			for(int i = 0; i < numberOfPixels; i++) {
 				red += pixels[i].r;
 				green += pixels[i].g;
 				blue += pixels[i].b;
 			}
+			
 			red /= numberOfPixels;
 			green /= numberOfPixels;
 			blue/= numberOfPixels;
+			
 			CGContextRelease(context);
 		}
-		free(pixels);
+		
+		self.currentColor = [NSColor colorWithRed:red/255.0f green:green/255.0f blue:blue/255.0f alpha:1.0f];
 	}
-	self.currentColor = [NSColor colorWithRed:red/255.0f green:green/255.0f blue:blue/255.0f alpha:1.0f];
 }
 
 #pragma mark local connection callbacks
@@ -227,6 +273,10 @@ struct pixel {
 - (void) update {
 	if(!self.croppingImage.image) {
 		self.croppingImage.image = self.currentFrame;
+		
+		if(self.croppedImageFrame) {
+			self.croppedImagePreview.image = self.croppedImageFrame;
+		}
 	}
 	
 	if(self.livePreview.state == NSOnState) {
@@ -240,15 +290,12 @@ struct pixel {
 		if(self.preview.superview) {
 			[self.preview removeFromSuperview];
 		}
+		
 		self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
 		
 	}
 	
 	[self changeHueToColor:self.currentColor];
-}
-
-- (IBAction) updateBrightness:(id)sender {
-	
 }
 
 - (IBAction) captureImageForCropping:(id)sender {

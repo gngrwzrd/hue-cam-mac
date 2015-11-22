@@ -21,6 +21,7 @@
 		07B9F9981C00EACF00A7F67E /* DispatchQueueLogFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F9911C00EACF00A7F67E /* DispatchQueueLogFormatter.m */; };
 		07B9F99A1C00EAD800A7F67E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07B9F9991C00EAD800A7F67E /* SystemConfiguration.framework */; };
 		07B9F99C1C00F59100A7F67E /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07B9F99B1C00F59100A7F67E /* AVFoundation.framework */; };
+		07B9F99F1C01629C00A7F67E /* CropSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F99E1C01629C00A7F67E /* CropSelector.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +49,8 @@
 		07B9F9911C00EACF00A7F67E /* DispatchQueueLogFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DispatchQueueLogFormatter.m; sourceTree = "<group>"; };
 		07B9F9991C00EAD800A7F67E /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		07B9F99B1C00F59100A7F67E /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		07B9F99D1C01629C00A7F67E /* CropSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CropSelector.h; sourceTree = "<group>"; };
+		07B9F99E1C01629C00A7F67E /* CropSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CropSelector.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +93,8 @@
 				07B9F9761C00EAA800A7F67E /* MainMenu.xib */,
 				07B9F9791C00EAA800A7F67E /* Info.plist */,
 				07B9F9711C00EAA800A7F67E /* Supporting Files */,
+				07B9F99D1C01629C00A7F67E /* CropSelector.h */,
+				07B9F99E1C01629C00A7F67E /* CropSelector.m */,
 			);
 			path = HueCam;
 			sourceTree = "<group>";
@@ -214,6 +219,7 @@
 			files = (
 				07B9F9951C00EACF00A7F67E /* DDLog.m in Sources */,
 				07B9F9931C00EACF00A7F67E /* DDASLLogger.m in Sources */,
+				07B9F99F1C01629C00A7F67E /* CropSelector.m in Sources */,
 				07B9F9731C00EAA800A7F67E /* main.m in Sources */,
 				07B9F9701C00EAA800A7F67E /* AppDelegate.m in Sources */,
 				07B9F9981C00EACF00A7F67E /* DispatchQueueLogFormatter.m in Sources */,
@@ -370,6 +376,7 @@
 				07B9F97E1C00EAA800A7F67E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
