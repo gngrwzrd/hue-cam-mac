@@ -6,6 +6,7 @@
 @property IBOutlet NSView * preview;
 @property (weak) IBOutlet NSButton * livePreview;
 @property (weak) IBOutlet NSSlider * updateInterval;
+@property (weak) IBOutlet NSSlider * brightness;
 @property (weak) IBOutlet NSView * currentColorView;
 @property (weak) IBOutlet NSImageView * croppingImage;
 @property (weak) IBOutlet NSTextField * connectionMessage;

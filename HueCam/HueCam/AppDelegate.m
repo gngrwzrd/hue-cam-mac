@@ -31,6 +31,7 @@ struct pixel {
 	[self setupUI];
 	[self setupSDK];
 	[self setupCapture];
+	[self intervalUpdate:nil];
 }
 
 - (void) setupUI {
@@ -93,6 +94,7 @@ struct pixel {
 }
 
 - (IBAction) connect:(id)sender {
+	self.connectionMessage.stringValue = @"Connecting...";
 	self.search = [[PHBridgeSearching alloc] initWithUpnpSearch:TRUE andPortalSearch:FALSE andIpAdressSearch:FALSE];
 	[self.search startSearchWithCompletionHandler:^(NSDictionary *bridgesFound) {
 		for(NSString * key in bridgesFound) {
@@ -223,7 +225,9 @@ struct pixel {
 #pragma mark local connection callbacks
 
 - (void) update {
-	[self changeHueToColor:self.currentColor];
+	if(!self.croppingImage.image) {
+		self.croppingImage.image = self.currentFrame;
+	}
 	
 	if(self.livePreview.state == NSOnState) {
 		
@@ -240,9 +244,11 @@ struct pixel {
 		
 	}
 	
-	if(!self.croppingImage.image) {
-		self.croppingImage.image = self.currentFrame;
-	}
+	[self changeHueToColor:self.currentColor];
+}
+
+- (IBAction) updateBrightness:(id)sender {
+	
 }
 
 - (IBAction) captureImageForCropping:(id)sender {
@@ -284,6 +290,8 @@ struct pixel {
 	// Set converted XY value to light state
 	lightState.x = @(xy.x);
 	lightState.y = @(xy.y);
+	
+	lightState.brightness = @(self.brightness.integerValue);
 	
 	// Create PHBridgeSendAPI object
 	PHBridgeSendAPI * bridgeSendAPI = [[PHBridgeSendAPI alloc] init];
