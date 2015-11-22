@@ -10,6 +10,7 @@ struct pixel {
 @interface AppDelegate ()
 @property (weak) IBOutlet NSWindow * window;
 
+@property BOOL updateColor;
 @property BOOL canChangeColor;
 @property BOOL lightState;
 
@@ -102,13 +103,17 @@ struct pixel {
 }
 
 - (void) captureOutput:(AVCaptureOutput *) captureOutput didOutputSampleBuffer:(CMSampleBufferRef) sampleBuffer fromConnection:(AVCaptureConnection *) connection {
-	[self updateCurrentFrameFromSampleBuffer:sampleBuffer];
-	[self updateDominantColorUsingColorCube];
+	if(self.updateColor) {
+		[self updateCurrentFrameFromSampleBuffer:sampleBuffer];
+		[self updateDominantColorUsingColorCube];
+		//[self updateDominantColorForCurrentFrame];
+		self.updateColor = FALSE;
+	}
 }
 
 - (void) setupSDK {
 	self.sdk = [[PHHueSDK alloc] init];
-	[self.sdk enableLogging:TRUE];
+	//[self.sdk enableLogging:TRUE];
 	[self.sdk startUpSDK];
 	
 	if([[NSUserDefaults standardUserDefaults] boolForKey:@"BridgeConnected"]) {
@@ -246,7 +251,9 @@ struct pixel {
 static struct pixel * pixels = NULL;
 
 - (void) updateDominantColorUsingColorCube {
-	NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame flags:CCAvoidBlack|CCAvoidWhite|CCOnlyDistinctColors|CCOnlyBrightColors count:1];
+	NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame
+														flags:CCAvoidBlack|CCAvoidWhite|CCOnlyBrightColors
+														count:1];
 	if(colors.count > 0) {
 		self.currentColor = [colors objectAtIndex:0];
 	}
@@ -291,6 +298,8 @@ static struct pixel * pixels = NULL;
 #pragma mark local connection callbacks
 
 - (void) update {
+	self.updateColor = TRUE;
+	
 	if(!NSEqualRects(self.cropDisplay.cropRect,self.cropSelector.cropRect)) {
 		self.cropDisplay.cropRect = self.cropSelector.cropRect;
 		[self.cropDisplay setNeedsDisplay:TRUE];
@@ -309,7 +318,7 @@ static struct pixel * pixels = NULL;
 
 - (IBAction) intervalUpdate:(id)sender {
 	[self.updateIntervalTimer invalidate];
-	self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:1/self.updateInterval.floatValue target:self selector:@selector(update) userInfo:nil repeats:TRUE];
+	self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(update) userInfo:nil repeats:TRUE];
 }
 
 - (IBAction) livePreviewToggle:(id)sender {
@@ -404,6 +413,7 @@ static struct pixel * pixels = NULL;
 	lightState.x = @(xy.x);
 	lightState.y = @(xy.y);
 	lightState.on = @(self.lightState);
+	lightState.transitionTime = @(10);
 	lightState.brightness = @(self.brightness.integerValue);
 	
 	// Create PHBridgeSendAPI object
