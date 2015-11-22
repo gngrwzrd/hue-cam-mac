@@ -179,7 +179,7 @@ struct pixel {
 }
 
 - (void) buttonNotPressed:(id) sender {
-	self.connectionMessage.stringValue = @"Button Not Pressed, Try Again";
+	self.connectionMessage.stringValue = @"!! Press Link Button on Bridge !!";
 }
 
 #pragma mark utils
