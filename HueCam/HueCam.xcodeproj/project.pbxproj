@@ -116,8 +116,8 @@
 				07B9F96F1C00EAA800A7F67E /* AppDelegate.m */,
 				07B9F99D1C01629C00A7F67E /* CropSelector.h */,
 				07B9F99E1C01629C00A7F67E /* CropSelector.m */,
-				07B9F97F1C00EABF00A7F67E /* Frameworks */,
 				07B9F9761C00EAA800A7F67E /* MainMenu.xib */,
+				07B9F97F1C00EABF00A7F67E /* Frameworks */,
 				07AEAF241C0215F50065516B /* Resources */,
 				07B9F9711C00EAA800A7F67E /* Supporting Files */,
 			);

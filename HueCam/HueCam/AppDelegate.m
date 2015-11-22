@@ -11,6 +11,7 @@ struct pixel {
 @property (weak) IBOutlet NSWindow * window;
 
 @property BOOL canChangeColor;
+@property BOOL lightState;
 
 @property PHHueSDK * sdk;
 @property PHBridgeSearching * search;
@@ -110,7 +111,7 @@ struct pixel {
 
 - (void) setupSDK {
 	self.sdk = [[PHHueSDK alloc] init];
-	//[self.sdk enableLogging:TRUE];
+	[self.sdk enableLogging:TRUE];
 	[self.sdk startUpSDK];
 	
 	if([[NSUserDefaults standardUserDefaults] boolForKey:@"BridgeConnected"]) {
@@ -293,26 +294,13 @@ static struct pixel * pixels = NULL;
 #pragma mark local connection callbacks
 
 - (void) update {
-	self.cropDisplay.cropRect = self.cropSelector.cropRect;
-	[self.cropDisplay setNeedsDisplay:TRUE];
+	if(!NSEqualRects(self.cropDisplay.cropRect,self.cropSelector.cropRect)) {
+		self.cropDisplay.cropRect = self.cropSelector.cropRect;
+		[self.cropDisplay setNeedsDisplay:TRUE];
+	}
 	
 	if(!self.croppingImage.image) {
 		self.croppingImage.image = self.currentFrame;
-		
-		if(self.croppedImageFrame) {
-			self.croppedImagePreview.image = self.croppedImageFrame;
-		}
-	}
-	
-	if(self.livePreview.state == NSOnState) {
-		
-		self.currentColorView.hidden = TRUE;
-		
-	} else {
-		
-		self.currentColorView.hidden = FALSE;
-		self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
-		
 	}
 	
 	[self changeHueToColor:self.currentColor];
@@ -327,9 +315,80 @@ static struct pixel * pixels = NULL;
 	self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:1/self.updateInterval.floatValue target:self selector:@selector(update) userInfo:nil repeats:TRUE];
 }
 
+- (IBAction) livePreviewToggle:(id)sender {
+	if(self.livePreview.state == NSOnState) {
+		self.currentColorView.hidden = TRUE;
+	} else {
+		self.currentColorView.hidden = FALSE;
+		self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
+	}
+}
+
+- (IBAction) updateBrightness:(id)sender {
+	PHBridgeResourcesCache * cache = [PHBridgeResourcesReader readBridgeResourcesCache];
+	PHLight * light = [cache.lights objectForKey:@"1"];
+	
+	PHLightState * state = [[PHLightState alloc] init];
+	state.brightness = @(self.brightness.integerValue);
+	
+	// Create PHBridgeSendAPI object
+	PHBridgeSendAPI * bridgeSendAPI = [[PHBridgeSendAPI alloc] init];
+	[bridgeSendAPI updateLightStateForId:light.identifier withLightState:state completionHandler:^(NSArray *errors) {
+		
+	}];
+}
+
+- (IBAction) powerToggle:(id) sender {
+	NSLog(@"power toggle");
+	
+	self.lightState = !self.lightState;
+	
+	if(self.lightState) {
+		self.powerButton.title = @"Turn Light Off";
+		
+		PHBridgeResourcesCache * cache = [PHBridgeResourcesReader readBridgeResourcesCache];
+		PHLight * light = [cache.lights objectForKey:@"1"];
+		
+		PHLightState * state = [[PHLightState alloc] init];
+		state.on = @(YES);
+		
+		// Create PHBridgeSendAPI object
+		PHBridgeSendAPI * bridgeSendAPI = [[PHBridgeSendAPI alloc] init];
+		[bridgeSendAPI updateLightStateForId:light.identifier withLightState:state completionHandler:^(NSArray *errors) {
+			
+		}];
+		
+	} else {
+		self.powerButton.title = @"Turn Light On";
+		
+		PHBridgeResourcesCache * cache = [PHBridgeResourcesReader readBridgeResourcesCache];
+		PHLight * light = [cache.lights objectForKey:@"1"];
+		
+		PHLightState * state = [[PHLightState alloc] init];
+		state.on = @(NO);
+		
+		// Create PHBridgeSendAPI object
+		PHBridgeSendAPI * bridgeSendAPI = [[PHBridgeSendAPI alloc] init];
+		[bridgeSendAPI updateLightStateForId:light.identifier withLightState:state completionHandler:^(NSArray *errors) {
+			
+		}];
+	}
+}
+
 - (void) localConnection {
 	self.canChangeColor = TRUE;
 	self.connectionMessage.stringValue = @"Connected";
+	
+	PHBridgeResourcesCache * cache = [PHBridgeResourcesReader readBridgeResourcesCache];
+	PHLight * light = [cache.lights objectForKey:@"1"];
+	
+	if(light.lightState.on.boolValue) {
+		self.lightState = TRUE;
+		self.powerButton.title = @"Turn Light Off";
+	} else {
+		self.lightState = FALSE;
+		self.powerButton.title = @"Turn Light On";
+	}
 }
 
 - (void) notAuthenticated {
@@ -337,33 +396,23 @@ static struct pixel * pixels = NULL;
 }
 
 - (void) changeHueToColor:(NSColor *) color {
-	if(!self.canChangeColor) {
+	if(!self.canChangeColor || !self.lightState) {
 		return;
 	}
 	
 	PHBridgeResourcesCache * cache = [PHBridgeResourcesReader readBridgeResourcesCache];
-	// And now you can get any resource you want, for example:
-	//NSArray * myLights = [cache.lights allValues];
-	
-	// Get light from cache
 	PHLight * light = [cache.lights objectForKey:@"1"];
-	
-	// Convert color red to a XY value
 	CGPoint xy = [PHUtilities calculateXY:color forModel:light.modelNumber];
-	
-	// Create new light state object
 	PHLightState * lightState = [[PHLightState alloc] init];
-	
-	// Set converted XY value to light state
 	lightState.x = @(xy.x);
 	lightState.y = @(xy.y);
-	
+	lightState.on = @(self.lightState);
 	lightState.brightness = @(self.brightness.integerValue);
 	
 	// Create PHBridgeSendAPI object
 	PHBridgeSendAPI * bridgeSendAPI = [[PHBridgeSendAPI alloc] init];
 	[bridgeSendAPI updateLightStateForId:light.identifier withLightState:lightState completionHandler:^(NSArray *errors) {
-		NSLog(@"updated!");
+		
 	}];
 }
 
