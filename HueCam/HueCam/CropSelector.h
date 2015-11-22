@@ -4,5 +4,6 @@
 @interface CropSelector : NSView
 
 @property CGRect cropRect;
+@property BOOL displayOnly;
 
 @end

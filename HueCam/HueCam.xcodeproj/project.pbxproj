@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		07AEAF221C0211F90065516B /* CCColorCube.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AEAF1F1C0211F90065516B /* CCColorCube.m */; };
+		07AEAF231C0211F90065516B /* CCLocalMaximum.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AEAF211C0211F90065516B /* CCLocalMaximum.m */; };
 		07B9F9701C00EAA800A7F67E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F96F1C00EAA800A7F67E /* AppDelegate.m */; };
 		07B9F9731C00EAA800A7F67E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F9721C00EAA800A7F67E /* main.m */; };
 		07B9F9751C00EAA800A7F67E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07B9F9741C00EAA800A7F67E /* Assets.xcassets */; };
@@ -25,6 +27,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		07AEAF1E1C0211F90065516B /* CCColorCube.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCColorCube.h; path = "libs/ColorCube-master/ColorCube/ColorCube/CCColorCube.h"; sourceTree = SOURCE_ROOT; };
+		07AEAF1F1C0211F90065516B /* CCColorCube.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCColorCube.m; path = "libs/ColorCube-master/ColorCube/ColorCube/CCColorCube.m"; sourceTree = SOURCE_ROOT; };
+		07AEAF201C0211F90065516B /* CCLocalMaximum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCLocalMaximum.h; path = "libs/ColorCube-master/ColorCube/ColorCube/CCLocalMaximum.h"; sourceTree = SOURCE_ROOT; };
+		07AEAF211C0211F90065516B /* CCLocalMaximum.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCLocalMaximum.m; path = "libs/ColorCube-master/ColorCube/ColorCube/CCLocalMaximum.m"; sourceTree = SOURCE_ROOT; };
 		07B9F96B1C00EAA800A7F67E /* HueCam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HueCam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		07B9F96E1C00EAA800A7F67E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		07B9F96F1C00EAA800A7F67E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -67,6 +73,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		07AEAF1D1C0211F20065516B /* ColorCube */ = {
+			isa = PBXGroup;
+			children = (
+				07AEAF1E1C0211F90065516B /* CCColorCube.h */,
+				07AEAF1F1C0211F90065516B /* CCColorCube.m */,
+				07AEAF201C0211F90065516B /* CCLocalMaximum.h */,
+				07AEAF211C0211F90065516B /* CCLocalMaximum.m */,
+			);
+			name = ColorCube;
+			sourceTree = "<group>";
+		};
+		07AEAF241C0215F50065516B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				07B9F9791C00EAA800A7F67E /* Info.plist */,
+				07B9F9741C00EAA800A7F67E /* Assets.xcassets */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		07B9F9621C00EAA800A7F67E = {
 			isa = PBXGroup;
 			children = (
@@ -86,15 +112,14 @@
 		07B9F96D1C00EAA800A7F67E /* HueCam */ = {
 			isa = PBXGroup;
 			children = (
-				07B9F97F1C00EABF00A7F67E /* Frameworks */,
 				07B9F96E1C00EAA800A7F67E /* AppDelegate.h */,
 				07B9F96F1C00EAA800A7F67E /* AppDelegate.m */,
-				07B9F9741C00EAA800A7F67E /* Assets.xcassets */,
-				07B9F9761C00EAA800A7F67E /* MainMenu.xib */,
-				07B9F9791C00EAA800A7F67E /* Info.plist */,
-				07B9F9711C00EAA800A7F67E /* Supporting Files */,
 				07B9F99D1C01629C00A7F67E /* CropSelector.h */,
 				07B9F99E1C01629C00A7F67E /* CropSelector.m */,
+				07B9F97F1C00EABF00A7F67E /* Frameworks */,
+				07B9F9761C00EAA800A7F67E /* MainMenu.xib */,
+				07AEAF241C0215F50065516B /* Resources */,
+				07B9F9711C00EAA800A7F67E /* Supporting Files */,
 			);
 			path = HueCam;
 			sourceTree = "<group>";
@@ -110,6 +135,7 @@
 		07B9F97F1C00EABF00A7F67E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				07AEAF1D1C0211F20065516B /* ColorCube */,
 				07B9F99B1C00F59100A7F67E /* AVFoundation.framework */,
 				07B9F9991C00EAD800A7F67E /* SystemConfiguration.framework */,
 				07B9F9821C00EACF00A7F67E /* Lumberjack */,
@@ -221,7 +247,9 @@
 				07B9F9931C00EACF00A7F67E /* DDASLLogger.m in Sources */,
 				07B9F99F1C01629C00A7F67E /* CropSelector.m in Sources */,
 				07B9F9731C00EAA800A7F67E /* main.m in Sources */,
+				07AEAF221C0211F90065516B /* CCColorCube.m in Sources */,
 				07B9F9701C00EAA800A7F67E /* AppDelegate.m in Sources */,
+				07AEAF231C0211F90065516B /* CCLocalMaximum.m in Sources */,
 				07B9F9981C00EACF00A7F67E /* DispatchQueueLogFormatter.m in Sources */,
 				07B9F9921C00EACF00A7F67E /* DDAbstractDatabaseLogger.m in Sources */,
 				07B9F9961C00EACF00A7F67E /* DDTTYLogger.m in Sources */,

@@ -1,6 +1,7 @@
 
 #import "AppDelegate.h"
 #import <HueSDK_OSX/HueSDK.h>
+#import "CCColorCube.h"
 
 struct pixel {
 	unsigned char r, g, b, a;
@@ -27,12 +28,15 @@ struct pixel {
 @property NSTimer * updateIntervalTimer;
 @property CGRect cropRect;
 
+@property CCColorCube * colorCube;
+
 @end
 
 @implementation AppDelegate
 
 - (void) applicationDidFinishLaunching:(NSNotification *) aNotification {
 	self.canChangeColor = FALSE;
+	self.colorCube = [[CCColorCube alloc] init];
 	[self setupUI];
 	[self setupSDK];
 	[self setupCapture];
@@ -43,12 +47,19 @@ struct pixel {
 	self.croppingImage.wantsLayer = TRUE;
 	self.croppingImage.layer.zPosition = 1;
 	self.croppingImage.layer.backgroundColor = [[NSColor blackColor] CGColor];
+	
+	self.preview.wantsLayer = TRUE;
+	self.preview.layer.zPosition = 5;
+	
 	self.currentColorView.wantsLayer = TRUE;
+	self.currentColorView.layer.zPosition = 10;
 	
 	self.cropSelector.wantsLayer = TRUE;
-	self.cropSelector.layer.zPosition = 10;
-	//self.cropSelector.frame = self.croppingImage.bounds;
-	//[self.croppingImage addSubview:self.cropSelector];
+	self.cropSelector.layer.zPosition = 20;
+	
+	self.cropDisplay.displayOnly = TRUE;
+	self.cropDisplay.wantsLayer = TRUE;
+	self.cropDisplay.layer.zPosition = 30;
 }
 
 - (void) setupCapture {
@@ -78,10 +89,12 @@ struct pixel {
 	
 	//setup preview layer
 	self.preview.wantsLayer = TRUE;
+	self.preview.layer.zPosition = 5;
 	self.preview.layer.backgroundColor = [[NSColor blackColor] CGColor];
 	AVCaptureVideoPreviewLayer * previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
 	previewLayer.frame = self.preview.bounds;
 	[self.preview.layer addSublayer:previewLayer];
+	previewLayer.zPosition = 1;
 	
 	//start session
 	[self.session startRunning];
@@ -90,7 +103,8 @@ struct pixel {
 - (void) captureOutput:(AVCaptureOutput *) captureOutput didOutputSampleBuffer:(CMSampleBufferRef) sampleBuffer fromConnection:(AVCaptureConnection *) connection {
 	[self updateCurrentFrameFromSampleBuffer:sampleBuffer];
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[self updateDominantColorForCurrentFrame];
+		//[self updateDominantColorForCurrentFrame];
+		[self updateDominantColorUsingColorCube];
 	});
 }
 
@@ -131,6 +145,7 @@ struct pixel {
 	if([[NSUserDefaults standardUserDefaults] boolForKey:@"BridgeConnected"]) {
 		[self startLocalConnection];
 	} else {
+		self.connectionMessage.stringValue = @"!! Press Link Button on Bridge !!";
 		[self.sdk startPushlinkAuthentication];
 	}
 }
@@ -232,6 +247,13 @@ struct pixel {
 
 static struct pixel * pixels = NULL;
 
+- (void) updateDominantColorUsingColorCube {
+	NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame flags:CCAvoidBlack|CCAvoidWhite|CCOnlyDistinctColors|CCOnlyBrightColors count:1];
+	if(colors.count > 0) {
+		self.currentColor = [colors objectAtIndex:0];
+	}
+}
+
 - (void) updateDominantColorForCurrentFrame {
 	NSImage * image = self.croppedImageFrame;
 	CGImageRef cgimage = self.croppedImageCGFrame;
@@ -271,6 +293,9 @@ static struct pixel * pixels = NULL;
 #pragma mark local connection callbacks
 
 - (void) update {
+	self.cropDisplay.cropRect = self.cropSelector.cropRect;
+	[self.cropDisplay setNeedsDisplay:TRUE];
+	
 	if(!self.croppingImage.image) {
 		self.croppingImage.image = self.currentFrame;
 		
@@ -281,16 +306,11 @@ static struct pixel * pixels = NULL;
 	
 	if(self.livePreview.state == NSOnState) {
 		
-		if(!self.preview.superview) {
-			[self.window.contentView addSubview:self.preview];
-		}
+		self.currentColorView.hidden = TRUE;
 		
 	} else {
 		
-		if(self.preview.superview) {
-			[self.preview removeFromSuperview];
-		}
-		
+		self.currentColorView.hidden = FALSE;
 		self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
 		
 	}

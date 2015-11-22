@@ -12,6 +12,8 @@
 @property (weak) IBOutlet NSImageView * croppingImage;
 @property (weak) IBOutlet NSImageView * croppedImagePreview;
 @property (weak) IBOutlet NSTextField * connectionMessage;
+
 @property IBOutlet CropSelector * cropSelector;
+@property IBOutlet CropSelector * cropDisplay;
 @end
 
