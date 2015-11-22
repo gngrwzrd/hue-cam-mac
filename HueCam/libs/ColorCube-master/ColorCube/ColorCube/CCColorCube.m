@@ -187,7 +187,7 @@ int neighbourIndices[27][3] = {
     }
 
     // Deallocate raw pixel data memory
-    free(rawData);
+ //   free(rawData);
 
     // We collect local maxima in here
     NSMutableArray *localMaxima = [NSMutableArray array];
@@ -506,8 +506,11 @@ int neighbourIndices[27][3] = {
 
 #pragma mark - Pixel data extraction
 
+static unsigned char * rawData = NULL;
+
 - (unsigned char *)rawPixelDataFromImage:(NSImage *)image pixelCount:(unsigned int*)pixelCount
 {
+	
     // Get cg image and its size
     //CGImageRef cgImage = [image CGImage];
 	NSRect rect = CGRectMake(0,0,0,0);
@@ -516,7 +519,10 @@ int neighbourIndices[27][3] = {
     NSUInteger height = CGImageGetHeight(cgImage);
 
     // Allocate storage for the pixel data
-    unsigned char *rawData = (unsigned char *)malloc(height * width * 4);
+	if(!rawData) {
+		rawData = (unsigned char *)malloc(height * width * 4);
+	}
+	//unsigned char *rawData = (unsigned char *)malloc(height * width * 4);
 
     // If allocation failed, return NULL
     if (!rawData) return NULL;

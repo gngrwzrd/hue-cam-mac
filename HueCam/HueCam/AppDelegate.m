@@ -103,10 +103,7 @@ struct pixel {
 
 - (void) captureOutput:(AVCaptureOutput *) captureOutput didOutputSampleBuffer:(CMSampleBufferRef) sampleBuffer fromConnection:(AVCaptureConnection *) connection {
 	[self updateCurrentFrameFromSampleBuffer:sampleBuffer];
-	dispatch_async(dispatch_get_main_queue(), ^{
-		//[self updateDominantColorForCurrentFrame];
-		[self updateDominantColorUsingColorCube];
-	});
+	[self updateDominantColorUsingColorCube];
 }
 
 - (void) setupSDK {
