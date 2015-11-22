@@ -819,7 +819,7 @@
                         <rect key="frame" x="251" y="634" width="71" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <animations/>
-                        <sliderCell key="cell" controlSize="small" state="on" alignment="left" minValue="4" maxValue="15" doubleValue="8" tickMarkPosition="above" sliderType="linear" id="T8Q-zn-g3l"/>
+                        <sliderCell key="cell" controlSize="small" state="on" alignment="left" minValue="2" maxValue="15" doubleValue="8" tickMarkPosition="above" sliderType="linear" id="T8Q-zn-g3l"/>
                         <connections>
                             <action selector="intervalUpdate:" target="Voe-Tx-rLC" id="ozw-6c-BSv"/>
                         </connections>
@@ -837,7 +837,7 @@
                 </subviews>
                 <animations/>
             </view>
-            <point key="canvasLocation" x="-1124.5" y="121"/>
+            <point key="canvasLocation" x="-1126.5" y="108"/>
         </window>
     </objects>
 </document>
