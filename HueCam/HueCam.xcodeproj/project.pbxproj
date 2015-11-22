@@ -1,0 +1,377 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		07B9F9701C00EAA800A7F67E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F96F1C00EAA800A7F67E /* AppDelegate.m */; };
+		07B9F9731C00EAA800A7F67E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F9721C00EAA800A7F67E /* main.m */; };
+		07B9F9751C00EAA800A7F67E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07B9F9741C00EAA800A7F67E /* Assets.xcassets */; };
+		07B9F9781C00EAA800A7F67E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 07B9F9761C00EAA800A7F67E /* MainMenu.xib */; };
+		07B9F9811C00EACB00A7F67E /* HueSDK_OSX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07B9F9801C00EACB00A7F67E /* HueSDK_OSX.framework */; };
+		07B9F9921C00EACF00A7F67E /* DDAbstractDatabaseLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F9841C00EACF00A7F67E /* DDAbstractDatabaseLogger.m */; };
+		07B9F9931C00EACF00A7F67E /* DDASLLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F9861C00EACF00A7F67E /* DDASLLogger.m */; };
+		07B9F9941C00EACF00A7F67E /* DDFileLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F9881C00EACF00A7F67E /* DDFileLogger.m */; };
+		07B9F9951C00EACF00A7F67E /* DDLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F98A1C00EACF00A7F67E /* DDLog.m */; };
+		07B9F9961C00EACF00A7F67E /* DDTTYLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F98C1C00EACF00A7F67E /* DDTTYLogger.m */; };
+		07B9F9971C00EACF00A7F67E /* ContextFilterLogFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F98F1C00EACF00A7F67E /* ContextFilterLogFormatter.m */; };
+		07B9F9981C00EACF00A7F67E /* DispatchQueueLogFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F9911C00EACF00A7F67E /* DispatchQueueLogFormatter.m */; };
+		07B9F99A1C00EAD800A7F67E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07B9F9991C00EAD800A7F67E /* SystemConfiguration.framework */; };
+		07B9F99C1C00F59100A7F67E /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07B9F99B1C00F59100A7F67E /* AVFoundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		07B9F96B1C00EAA800A7F67E /* HueCam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HueCam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		07B9F96E1C00EAA800A7F67E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		07B9F96F1C00EAA800A7F67E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		07B9F9721C00EAA800A7F67E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		07B9F9741C00EAA800A7F67E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		07B9F9771C00EAA800A7F67E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		07B9F9791C00EAA800A7F67E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		07B9F9801C00EACB00A7F67E /* HueSDK_OSX.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HueSDK_OSX.framework; path = "libs/PhilipsHueSDK-iOS-OSX-master/HueSDK_OSX.framework"; sourceTree = SOURCE_ROOT; };
+		07B9F9831C00EACF00A7F67E /* DDAbstractDatabaseLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDAbstractDatabaseLogger.h; sourceTree = "<group>"; };
+		07B9F9841C00EACF00A7F67E /* DDAbstractDatabaseLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDAbstractDatabaseLogger.m; sourceTree = "<group>"; };
+		07B9F9851C00EACF00A7F67E /* DDASLLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDASLLogger.h; sourceTree = "<group>"; };
+		07B9F9861C00EACF00A7F67E /* DDASLLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDASLLogger.m; sourceTree = "<group>"; };
+		07B9F9871C00EACF00A7F67E /* DDFileLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDFileLogger.h; sourceTree = "<group>"; };
+		07B9F9881C00EACF00A7F67E /* DDFileLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDFileLogger.m; sourceTree = "<group>"; };
+		07B9F9891C00EACF00A7F67E /* DDLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDLog.h; sourceTree = "<group>"; };
+		07B9F98A1C00EACF00A7F67E /* DDLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDLog.m; sourceTree = "<group>"; };
+		07B9F98B1C00EACF00A7F67E /* DDTTYLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDTTYLogger.h; sourceTree = "<group>"; };
+		07B9F98C1C00EACF00A7F67E /* DDTTYLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDTTYLogger.m; sourceTree = "<group>"; };
+		07B9F98E1C00EACF00A7F67E /* ContextFilterLogFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContextFilterLogFormatter.h; sourceTree = "<group>"; };
+		07B9F98F1C00EACF00A7F67E /* ContextFilterLogFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContextFilterLogFormatter.m; sourceTree = "<group>"; };
+		07B9F9901C00EACF00A7F67E /* DispatchQueueLogFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DispatchQueueLogFormatter.h; sourceTree = "<group>"; };
+		07B9F9911C00EACF00A7F67E /* DispatchQueueLogFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DispatchQueueLogFormatter.m; sourceTree = "<group>"; };
+		07B9F9991C00EAD800A7F67E /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		07B9F99B1C00F59100A7F67E /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		07B9F9681C00EAA800A7F67E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07B9F99C1C00F59100A7F67E /* AVFoundation.framework in Frameworks */,
+				07B9F99A1C00EAD800A7F67E /* SystemConfiguration.framework in Frameworks */,
+				07B9F9811C00EACB00A7F67E /* HueSDK_OSX.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		07B9F9621C00EAA800A7F67E = {
+			isa = PBXGroup;
+			children = (
+				07B9F96D1C00EAA800A7F67E /* HueCam */,
+				07B9F96C1C00EAA800A7F67E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		07B9F96C1C00EAA800A7F67E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				07B9F96B1C00EAA800A7F67E /* HueCam.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		07B9F96D1C00EAA800A7F67E /* HueCam */ = {
+			isa = PBXGroup;
+			children = (
+				07B9F97F1C00EABF00A7F67E /* Frameworks */,
+				07B9F96E1C00EAA800A7F67E /* AppDelegate.h */,
+				07B9F96F1C00EAA800A7F67E /* AppDelegate.m */,
+				07B9F9741C00EAA800A7F67E /* Assets.xcassets */,
+				07B9F9761C00EAA800A7F67E /* MainMenu.xib */,
+				07B9F9791C00EAA800A7F67E /* Info.plist */,
+				07B9F9711C00EAA800A7F67E /* Supporting Files */,
+			);
+			path = HueCam;
+			sourceTree = "<group>";
+		};
+		07B9F9711C00EAA800A7F67E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				07B9F9721C00EAA800A7F67E /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		07B9F97F1C00EABF00A7F67E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				07B9F99B1C00F59100A7F67E /* AVFoundation.framework */,
+				07B9F9991C00EAD800A7F67E /* SystemConfiguration.framework */,
+				07B9F9821C00EACF00A7F67E /* Lumberjack */,
+				07B9F9801C00EACB00A7F67E /* HueSDK_OSX.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		07B9F9821C00EACF00A7F67E /* Lumberjack */ = {
+			isa = PBXGroup;
+			children = (
+				07B9F9831C00EACF00A7F67E /* DDAbstractDatabaseLogger.h */,
+				07B9F9841C00EACF00A7F67E /* DDAbstractDatabaseLogger.m */,
+				07B9F9851C00EACF00A7F67E /* DDASLLogger.h */,
+				07B9F9861C00EACF00A7F67E /* DDASLLogger.m */,
+				07B9F9871C00EACF00A7F67E /* DDFileLogger.h */,
+				07B9F9881C00EACF00A7F67E /* DDFileLogger.m */,
+				07B9F9891C00EACF00A7F67E /* DDLog.h */,
+				07B9F98A1C00EACF00A7F67E /* DDLog.m */,
+				07B9F98B1C00EACF00A7F67E /* DDTTYLogger.h */,
+				07B9F98C1C00EACF00A7F67E /* DDTTYLogger.m */,
+				07B9F98D1C00EACF00A7F67E /* Extensions */,
+			);
+			name = Lumberjack;
+			path = "libs/PhilipsHueSDK-iOS-OSX-master/Lumberjack";
+			sourceTree = SOURCE_ROOT;
+		};
+		07B9F98D1C00EACF00A7F67E /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				07B9F98E1C00EACF00A7F67E /* ContextFilterLogFormatter.h */,
+				07B9F98F1C00EACF00A7F67E /* ContextFilterLogFormatter.m */,
+				07B9F9901C00EACF00A7F67E /* DispatchQueueLogFormatter.h */,
+				07B9F9911C00EACF00A7F67E /* DispatchQueueLogFormatter.m */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		07B9F96A1C00EAA800A7F67E /* HueCam */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 07B9F97C1C00EAA800A7F67E /* Build configuration list for PBXNativeTarget "HueCam" */;
+			buildPhases = (
+				07B9F9671C00EAA800A7F67E /* Sources */,
+				07B9F9681C00EAA800A7F67E /* Frameworks */,
+				07B9F9691C00EAA800A7F67E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HueCam;
+			productName = HueCam;
+			productReference = 07B9F96B1C00EAA800A7F67E /* HueCam.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		07B9F9631C00EAA800A7F67E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0710;
+				ORGANIZATIONNAME = gngrwzrd;
+				TargetAttributes = {
+					07B9F96A1C00EAA800A7F67E = {
+						CreatedOnToolsVersion = 7.1.1;
+					};
+				};
+			};
+			buildConfigurationList = 07B9F9661C00EAA800A7F67E /* Build configuration list for PBXProject "HueCam" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 07B9F9621C00EAA800A7F67E;
+			productRefGroup = 07B9F96C1C00EAA800A7F67E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				07B9F96A1C00EAA800A7F67E /* HueCam */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		07B9F9691C00EAA800A7F67E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07B9F9751C00EAA800A7F67E /* Assets.xcassets in Resources */,
+				07B9F9781C00EAA800A7F67E /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		07B9F9671C00EAA800A7F67E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07B9F9951C00EACF00A7F67E /* DDLog.m in Sources */,
+				07B9F9931C00EACF00A7F67E /* DDASLLogger.m in Sources */,
+				07B9F9731C00EAA800A7F67E /* main.m in Sources */,
+				07B9F9701C00EAA800A7F67E /* AppDelegate.m in Sources */,
+				07B9F9981C00EACF00A7F67E /* DispatchQueueLogFormatter.m in Sources */,
+				07B9F9921C00EACF00A7F67E /* DDAbstractDatabaseLogger.m in Sources */,
+				07B9F9961C00EACF00A7F67E /* DDTTYLogger.m in Sources */,
+				07B9F9941C00EACF00A7F67E /* DDFileLogger.m in Sources */,
+				07B9F9971C00EACF00A7F67E /* ContextFilterLogFormatter.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		07B9F9761C00EAA800A7F67E /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				07B9F9771C00EAA800A7F67E /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		07B9F97A1C00EAA800A7F67E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		07B9F97B1C00EAA800A7F67E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		07B9F97D1C00EAA800A7F67E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/libs/PhilipsHueSDK-iOS-OSX-master",
+				);
+				INFOPLIST_FILE = HueCam/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = com.gngrwzrd.HueCam;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		07B9F97E1C00EAA800A7F67E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/libs/PhilipsHueSDK-iOS-OSX-master",
+				);
+				INFOPLIST_FILE = HueCam/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = com.gngrwzrd.HueCam;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		07B9F9661C00EAA800A7F67E /* Build configuration list for PBXProject "HueCam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				07B9F97A1C00EAA800A7F67E /* Debug */,
+				07B9F97B1C00EAA800A7F67E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		07B9F97C1C00EAA800A7F67E /* Build configuration list for PBXNativeTarget "HueCam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				07B9F97D1C00EAA800A7F67E /* Debug */,
+				07B9F97E1C00EAA800A7F67E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 07B9F9631C00EAA800A7F67E /* Project object */;
+}
