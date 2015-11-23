@@ -733,15 +733,6 @@
                             <rect key="frame" x="1" y="1" width="467" height="86"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <slider verticalHuggingPriority="750" id="fQ5-CI-DFZ">
-                                    <rect key="frame" x="337" y="49" width="110" height="17"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <animations/>
-                                    <sliderCell key="cell" controlSize="small" state="on" alignment="left" maxValue="254" doubleValue="254" tickMarkPosition="above" sliderType="linear" id="b2S-0n-4bg"/>
-                                    <connections>
-                                        <action selector="updateBrightness:" target="Voe-Tx-rLC" id="WC6-0d-pkF"/>
-                                    </connections>
-                                </slider>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="NVS-2s-ZHV">
                                     <rect key="frame" x="267" y="50" width="64" height="14"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -829,6 +820,15 @@
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
+                                <slider verticalHuggingPriority="750" id="fQ5-CI-DFZ">
+                                    <rect key="frame" x="337" y="49" width="110" height="17"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <animations/>
+                                    <sliderCell key="cell" controlSize="small" state="on" alignment="left" maxValue="254" doubleValue="254" tickMarkPosition="above" sliderType="linear" id="b2S-0n-4bg"/>
+                                    <connections>
+                                        <action selector="updateBrightness:" target="Voe-Tx-rLC" id="WC6-0d-pkF"/>
+                                    </connections>
+                                </slider>
                             </subviews>
                             <animations/>
                         </view>

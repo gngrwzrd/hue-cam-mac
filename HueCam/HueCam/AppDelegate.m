@@ -449,7 +449,7 @@ static struct pixel * pixels = NULL;
 	lightState.x = @(xy.x);
 	lightState.y = @(xy.y);
 	lightState.on = @(self.lightState);
-	lightState.transitionTime = @(10);
+	lightState.transitionTime = @(self.updateInterval.floatValue * 10);
 	lightState.brightness = @(self.brightness.integerValue);
 	
 	// Create PHBridgeSendAPI object
