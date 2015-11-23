@@ -55,6 +55,7 @@ struct pixel {
 	
 	self.currentColorView.wantsLayer = TRUE;
 	self.currentColorView.layer.zPosition = 10;
+	self.currentColorView.hidden = TRUE;
 	
 	self.cropSelector.wantsLayer = TRUE;
 	self.cropSelector.layer.zPosition = 20;
@@ -108,6 +109,9 @@ struct pixel {
 		[self updateDominantColorUsingColorCube];
 		//[self updateDominantColorForCurrentFrame];
 		self.updateColor = FALSE;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
+		});
 	}
 }
 
@@ -326,7 +330,6 @@ static struct pixel * pixels = NULL;
 		self.currentColorView.hidden = TRUE;
 	} else {
 		self.currentColorView.hidden = FALSE;
-		self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
 	}
 }
 
