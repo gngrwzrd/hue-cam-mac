@@ -46,23 +46,11 @@ struct pixel {
 }
 
 - (void) setupUI {
-	self.croppingImage.wantsLayer = TRUE;
-	self.croppingImage.layer.zPosition = 1;
-	self.croppingImage.layer.backgroundColor = [[NSColor blackColor] CGColor];
-	
 	self.preview.wantsLayer = TRUE;
 	self.preview.layer.zPosition = 5;
 	
-	self.currentColorView.wantsLayer = TRUE;
-	self.currentColorView.layer.zPosition = 10;
-	self.currentColorView.hidden = TRUE;
-	
 	self.cropSelector.wantsLayer = TRUE;
 	self.cropSelector.layer.zPosition = 20;
-	
-	self.cropDisplay.displayOnly = TRUE;
-	self.cropDisplay.wantsLayer = TRUE;
-	self.cropDisplay.layer.zPosition = 30;
 }
 
 - (void) setupCapture {
@@ -109,9 +97,6 @@ struct pixel {
 		[self updateDominantColorUsingColorCube];
 		//[self updateDominantColorForCurrentFrame];
 		self.updateColor = FALSE;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
-		});
 	}
 }
 
@@ -174,18 +159,22 @@ struct pixel {
 
 - (void) authenticationFailed {
 	self.connectionMessage.stringValue = @"Connection Failed, Try Again";
+	self.connectionButton.hidden = FALSE;
 }
 
 - (void) noLocalConnection {
 	self.connectionMessage.stringValue = @"Connection Failed, Try Again";
+	self.connectionButton.hidden = FALSE;
 }
 
 - (void) noLocalBridge {
 	self.connectionMessage.stringValue = @"Bridge Not Found, Reconnect";
+	self.connectionButton.hidden = FALSE;
 }
 
 - (void) buttonNotPressed:(id) sender {
 	self.connectionMessage.stringValue = @"!! Press Link Button on Bridge !!";
+	self.connectionButton.hidden = FALSE;
 }
 
 #pragma mark utils
@@ -255,9 +244,9 @@ struct pixel {
 static struct pixel * pixels = NULL;
 
 - (void) updateDominantColorUsingColorCube {
-	NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame
-														flags:CCAvoidBlack|CCAvoidWhite|CCOnlyBrightColors
-														count:1];
+	NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame flags:CCAvoidBlack|CCAvoidWhite|CCOnlyBrightColors count:1];
+	//NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame flags:CCAvoidBlack|CCAvoidWhite|CCOnlyDarkColors count:1];
+	//NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame flags:CCAvoidBlack|CCAvoidWhite|CCOnlyDistinctColors count:1];
 	if(colors.count > 0) {
 		self.currentColor = [colors objectAtIndex:0];
 	}
@@ -303,34 +292,12 @@ static struct pixel * pixels = NULL;
 
 - (void) update {
 	self.updateColor = TRUE;
-	
-	if(!NSEqualRects(self.cropDisplay.cropRect,self.cropSelector.cropRect)) {
-		self.cropDisplay.cropRect = self.cropSelector.cropRect;
-		[self.cropDisplay setNeedsDisplay:TRUE];
-	}
-	
-	if(!self.croppingImage.image) {
-		self.croppingImage.image = self.currentFrame;
-	}
-	
 	[self changeHueToColor:self.currentColor];
-}
-
-- (IBAction) captureImageForCropping:(id)sender {
-	self.croppingImage.image = nil;
 }
 
 - (IBAction) intervalUpdate:(id)sender {
 	[self.updateIntervalTimer invalidate];
 	self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(update) userInfo:nil repeats:TRUE];
-}
-
-- (IBAction) livePreviewToggle:(id)sender {
-	if(self.livePreview.state == NSOnState) {
-		self.currentColorView.hidden = TRUE;
-	} else {
-		self.currentColorView.hidden = FALSE;
-	}
 }
 
 - (IBAction) updateBrightness:(id)sender {
@@ -388,6 +355,8 @@ static struct pixel * pixels = NULL;
 	self.canChangeColor = TRUE;
 	self.connectionMessage.stringValue = @"Connected";
 	
+	self.connectionButton.hidden = TRUE;
+	
 	PHBridgeResourcesCache * cache = [PHBridgeResourcesReader readBridgeResourcesCache];
 	PHLight * light = [cache.lights objectForKey:@"1"];
 	
@@ -402,6 +371,7 @@ static struct pixel * pixels = NULL;
 
 - (void) notAuthenticated {
 	self.connectionMessage.stringValue = @"Not Authenticated, Try Again";
+	self.connectionButton.hidden = FALSE;
 }
 
 - (void) changeHueToColor:(NSColor *) color {
