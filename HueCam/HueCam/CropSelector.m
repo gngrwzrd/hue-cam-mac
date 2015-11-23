@@ -7,6 +7,8 @@
 #define HandleDrag 3
 #define HandleSize 10
 
+NSString * const CropSelectorCropRect = @"CropSelectorCropRect";
+
 @interface CropSelector ()
 @property CGRect topLeftHandle;
 @property CGRect bottomRightHandle;
@@ -27,6 +29,12 @@
 	self.topLeftHandle = CGRectMake(0,0,HandleSize,HandleSize);
 	self.bottomRightHandle = CGRectMake(self.bounds.size.width-HandleSize,self.bounds.size.height-HandleSize,HandleSize,HandleSize);
 	self.currentHandle = NoHandle;
+	
+	if([[NSUserDefaults standardUserDefaults] objectForKey:CropSelectorCropRect]) {
+		self.cropRect = NSRectFromString([[NSUserDefaults standardUserDefaults] objectForKey:CropSelectorCropRect]);
+		self.topLeftHandle = CGRectMake(self.cropRect.origin.x,self.cropRect.origin.y,HandleSize,HandleSize);
+		self.bottomRightHandle = CGRectMake((self.topLeftHandle.origin.x + self.cropRect.size.width) - HandleSize, (self.topLeftHandle.origin.y + self.cropRect.size.height) - HandleSize, HandleSize, HandleSize);
+	}
 }
 
 - (CGRect) rectForMiddleOval {
@@ -47,6 +55,9 @@
 
 - (void) drawRect:(NSRect) dirtyRect {
 	[super drawRect:dirtyRect];
+	
+	NSString * rect = NSStringFromRect(self.cropRect);
+	[[NSUserDefaults standardUserDefaults] setObject:rect forKey:CropSelectorCropRect];
 	
 	CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
 	

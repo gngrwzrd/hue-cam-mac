@@ -3,6 +3,14 @@
 #import <HueSDK_OSX/HueSDK.h>
 #import "CCColorCube.h"
 
+static NSString * const BridgeConnected = @"BridgeConnected";
+static NSString * const DarkColors = @"DarkColors";
+static NSString * const BrightColors = @"BrightColors";
+static NSString * const AvoidBlack = @"AvoidBlack";
+static NSString * const AvoidWhite = @"AvoidWhite";
+static NSString * const UpdateInterval = @"UpdateInterval";
+static NSString * const Brightness = @"Brightness";
+
 struct pixel {
 	unsigned char r, g, b, a;
 };
@@ -51,6 +59,23 @@ struct pixel {
 	
 	self.cropSelector.wantsLayer = TRUE;
 	self.cropSelector.layer.zPosition = 20;
+	
+	NSMutableDictionary * defaults = [NSMutableDictionary dictionary];
+	defaults[AvoidBlack] = @(TRUE);
+	defaults[AvoidWhite] = @(TRUE);
+	defaults[BrightColors] = @(TRUE);
+	defaults[DarkColors] = @(FALSE);
+	defaults[UpdateInterval] = @(1);
+	defaults[Brightness] = @(254);
+	
+	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
+	
+	self.avoidBlack.state = [[NSUserDefaults standardUserDefaults] boolForKey:AvoidBlack];
+	self.avoidWhite.state = [[NSUserDefaults standardUserDefaults] boolForKey:AvoidWhite];
+	self.brightColors.state = [[NSUserDefaults standardUserDefaults] boolForKey:BrightColors];
+	self.darkColors.state = [[NSUserDefaults standardUserDefaults] boolForKey:DarkColors];
+	self.updateInterval.floatValue = [[[NSUserDefaults standardUserDefaults] objectForKey:UpdateInterval] floatValue];
+	self.brightness.integerValue = [[[NSUserDefaults standardUserDefaults] objectForKey:Brightness] integerValue];
 }
 
 - (void) setupCapture {
@@ -105,7 +130,7 @@ struct pixel {
 	//[self.sdk enableLogging:TRUE];
 	[self.sdk startUpSDK];
 	
-	if([[NSUserDefaults standardUserDefaults] boolForKey:@"BridgeConnected"]) {
+	if([[NSUserDefaults standardUserDefaults] boolForKey:BridgeConnected]) {
 		[self connect:nil];
 	}
 }
@@ -134,7 +159,7 @@ struct pixel {
 	[phNotificationMgr registerObject:self withSelector:@selector(buttonNotPressed:) forNotification:PUSHLINK_BUTTON_NOT_PRESSED_NOTIFICATION];
 	
 	// Call to the Hue SDK to start the pushlinking process
-	if([[NSUserDefaults standardUserDefaults] boolForKey:@"BridgeConnected"]) {
+	if([[NSUserDefaults standardUserDefaults] boolForKey:BridgeConnected]) {
 		[self startLocalConnection];
 	} else {
 		self.connectionMessage.stringValue = @"!! Press Link Button on Bridge !!";
@@ -153,7 +178,7 @@ struct pixel {
 #pragma mark push link callbacks.
 
 - (void) authenticationSuccess {
-	[[NSUserDefaults standardUserDefaults] setBool:TRUE forKey:@"BridgeConnected"];
+	[[NSUserDefaults standardUserDefaults] setBool:TRUE forKey:BridgeConnected];
 	[self startLocalConnection];
 }
 
@@ -244,9 +269,20 @@ struct pixel {
 static struct pixel * pixels = NULL;
 
 - (void) updateDominantColorUsingColorCube {
-	NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame flags:CCAvoidBlack|CCAvoidWhite|CCOnlyBrightColors count:1];
-	//NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame flags:CCAvoidBlack|CCAvoidWhite|CCOnlyDarkColors count:1];
-	//NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame flags:CCAvoidBlack|CCAvoidWhite|CCOnlyDistinctColors count:1];
+	int flags = 0;
+	if(self.avoidBlack.state == NSOnState) {
+		flags |= CCAvoidBlack;
+	}
+	if(self.avoidWhite.state == NSOnState) {
+		flags |= CCAvoidWhite;
+	}
+	if(self.brightColors.state == NSOnState) {
+		flags |= CCOnlyBrightColors;
+	}
+	if(self.darkColors.state == NSOnState) {
+		flags |= CCOnlyDarkColors;
+	}
+	NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame flags:flags count:1];
 	if(colors.count > 0) {
 		self.currentColor = [colors objectAtIndex:0];
 	}
@@ -295,12 +331,34 @@ static struct pixel * pixels = NULL;
 	[self changeHueToColor:self.currentColor];
 }
 
-- (IBAction) intervalUpdate:(id)sender {
+- (IBAction) radioUpdate:(id) sender {
+	NSArray * radios = @[self.darkColors,self.brightColors];
+	for(NSButton * button in radios) {
+		if(button == sender) {
+			button.state = NSOnState;
+		} else {
+			button.state = NSOffState;
+		}
+	}
+	
+	[[NSUserDefaults standardUserDefaults] setObject:@(self.darkColors.state) forKey:DarkColors];
+	[[NSUserDefaults standardUserDefaults] setObject:@(self.brightColors.state) forKey:BrightColors];
+}
+
+- (IBAction) intervalUpdate:(id) sender {
 	[self.updateIntervalTimer invalidate];
-	self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(update) userInfo:nil repeats:TRUE];
+	self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:self.updateInterval.floatValue*10 target:self selector:@selector(update) userInfo:nil repeats:TRUE];
+	if(self.updateInterval.floatValue == 1 || self.updateInterval.floatValue == 2) {
+		self.updateIntervalLabel.stringValue = [NSString stringWithFormat:@"%li Seconds", self.updateInterval.integerValue];
+	} else {
+		self.updateIntervalLabel.stringValue = [NSString stringWithFormat:@"%0.2f Seconds", self.updateInterval.floatValue];
+	}
+	[[NSUserDefaults standardUserDefaults] setObject:@(self.updateInterval.floatValue) forKey:UpdateInterval];
 }
 
 - (IBAction) updateBrightness:(id)sender {
+	[[NSUserDefaults standardUserDefaults] setObject:@(self.brightness.floatValue) forKey:Brightness];
+	
 	PHBridgeResourcesCache * cache = [PHBridgeResourcesReader readBridgeResourcesCache];
 	PHLight * light = [cache.lights objectForKey:@"1"];
 	
@@ -349,6 +407,11 @@ static struct pixel * pixels = NULL;
 			
 		}];
 	}
+}
+
+- (IBAction) avoidColors:(id) sender {
+	[[NSUserDefaults standardUserDefaults] setObject:@(self.avoidBlack.state) forKey:AvoidBlack];
+	[[NSUserDefaults standardUserDefaults] setObject:@(self.avoidWhite.state) forKey:AvoidWhite];
 }
 
 - (void) localConnection {
