@@ -202,6 +202,9 @@ struct pixel {
 
 #pragma mark utils
 
+static CGContextRef _context;
+static CGColorSpaceRef _colorSpace;
+
 - (void) updateCurrentFrameFromSampleBuffer:(CMSampleBufferRef) sampleBuffer {
 	// Get a CMSampleBuffer's Core Video image buffer for the media data
 	CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
@@ -220,20 +223,24 @@ struct pixel {
 	size_t height = CVPixelBufferGetHeight(imageBuffer);
 	
 	// Create a device-dependent RGB color space
-	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+	if(!_colorSpace) {
+		_colorSpace = CGColorSpaceCreateDeviceRGB();
+	}
 	
-	// Create a bitmap graphics context with the sample buffer data
-	CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+	if(!_context) {
+		// Create a bitmap graphics context with the sample buffer data
+		_context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, _colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+	}
 	
 	// Create a Quartz image from the pixel data in the bitmap graphics context
-	CGImageRef quartzImage = CGBitmapContextCreateImage(context);
+	CGImageRef quartzImage = CGBitmapContextCreateImage(_context);
 	
 	// Unlock the pixel buffer
 	CVPixelBufferUnlockBaseAddress(imageBuffer,0);
 	
 	// Free up the context and color space
-	CGContextRelease(context);
-	CGColorSpaceRelease(colorSpace);
+	//CGContextRelease(context);
+	//CGColorSpaceRelease(colorSpace);
 	
 	// Create an image object from the Quartz image
 	NSImage * image = [[NSImage alloc] initWithCGImage:quartzImage size:NSMakeSize(width, height)];
