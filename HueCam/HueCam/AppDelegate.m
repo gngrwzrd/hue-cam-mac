@@ -16,7 +16,6 @@ struct pixel {
 @interface AppDelegate ()
 @property (weak) IBOutlet NSWindow * window;
 
-@property BOOL updateColor;
 @property BOOL canChangeColor;
 @property BOOL lightState;
 
@@ -115,12 +114,8 @@ struct pixel {
 }
 
 - (void) captureOutput:(AVCaptureOutput *) captureOutput didOutputSampleBuffer:(CMSampleBufferRef) sampleBuffer fromConnection:(AVCaptureConnection *) connection {
-	if(self.updateColor) {
-		[self updateCurrentFrameFromSampleBuffer:sampleBuffer];
-		//[self updateDominantColorUsingColorCube];
-		[self updateDominantColorForCurrentFrame];
-		self.updateColor = FALSE;
-	}
+	[self updateCurrentFrameFromSampleBuffer:sampleBuffer];
+	[self updateDominantColorForCurrentFrame];
 }
 
 - (void) setupSDK {
@@ -342,7 +337,6 @@ static struct pixel * pixels = NULL;
 #pragma mark local connection callbacks
 
 - (void) update {
-	self.updateColor = TRUE;
 	[self changeHueToColor:self.currentColor];
 }
 
@@ -350,6 +344,8 @@ static struct pixel * pixels = NULL;
 	[self.updateIntervalTimer invalidate];
 	
 	self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:self.updateInterval.floatValue target:self selector:@selector(update) userInfo:nil repeats:TRUE];
+	
+	//self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f/5.0f target:self selector:@selector(update) userInfo:nil repeats:TRUE];
 	
 	if(self.updateInterval.floatValue == 1 || self.updateInterval.floatValue == 2) {
 		self.updateIntervalLabel.stringValue = [NSString stringWithFormat:@"%li Seconds", self.updateInterval.integerValue];
