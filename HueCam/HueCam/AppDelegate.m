@@ -119,15 +119,15 @@ struct pixel {
 - (void) captureOutput:(AVCaptureOutput *) captureOutput didOutputSampleBuffer:(CMSampleBufferRef) sampleBuffer fromConnection:(AVCaptureConnection *) connection {
 	if(self.updateColor) {
 		[self updateCurrentFrameFromSampleBuffer:sampleBuffer];
-		[self updateDominantColorUsingColorCube];
-		//[self updateDominantColorForCurrentFrame];
+		//[self updateDominantColorUsingColorCube];
+		[self updateDominantColorForCurrentFrame];
 		self.updateColor = FALSE;
 	}
 }
 
 - (void) setupSDK {
 	self.sdk = [[PHHueSDK alloc] init];
-	//[self.sdk enableLogging:TRUE];
+	[self.sdk enableLogging:TRUE];
 	[self.sdk startUpSDK];
 	
 	if([[NSUserDefaults standardUserDefaults] boolForKey:BridgeConnected]) {
@@ -270,6 +270,7 @@ static struct pixel * pixels = NULL;
 
 - (void) updateDominantColorUsingColorCube {
 	int flags = 0;
+	
 	if(self.avoidBlack.state == NSOnState) {
 		flags |= CCAvoidBlack;
 	}
@@ -282,9 +283,11 @@ static struct pixel * pixels = NULL;
 	if(self.darkColors.state == NSOnState) {
 		flags |= CCOnlyDarkColors;
 	}
+	
 	NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame flags:flags count:1];
 	if(colors.count > 0) {
 		self.currentColor = [colors objectAtIndex:0];
+		NSLog(@"color: %@",colors[0]);
 	}
 }
 
@@ -308,6 +311,15 @@ static struct pixel * pixels = NULL;
 			NSUInteger numberOfPixels = image.size.width * image.size.height;
 			
 			for(int i = 0; i < numberOfPixels; i++) {
+				
+				if(pixels[i].r > 100 && pixels[i].g > 100 && pixels[i].b > 100) {
+					continue;
+				}
+				
+//				if(pixels[i].r < 50 && pixels[i].g < 50 && pixels[i].b < 50) {
+//					continue;
+//				}
+				
 				red += pixels[i].r;
 				green += pixels[i].g;
 				blue += pixels[i].b;
@@ -321,6 +333,22 @@ static struct pixel * pixels = NULL;
 		}
 		
 		self.currentColor = [NSColor colorWithRed:red/255.0f green:green/255.0f blue:blue/255.0f alpha:1.0f];
+		
+		CGFloat h,s,b,a;
+		[self.currentColor getHue:&h saturation:&s brightness:&b alpha:&a];
+		
+		if(s < .3) {
+			//NSLog(@"saturating more!");
+			s = .3;
+		}
+		
+		if(b > .8) {
+			b = .6;
+		}
+		
+		self.currentColor = [NSColor colorWithHue:h saturation:s brightness:b alpha:a];
+		
+		//NSLog(@"saturation: %f",self.currentColor.saturationComponent);
 	}
 }
 
@@ -347,12 +375,17 @@ static struct pixel * pixels = NULL;
 
 - (IBAction) intervalUpdate:(id) sender {
 	[self.updateIntervalTimer invalidate];
-	self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:self.updateInterval.floatValue*10 target:self selector:@selector(update) userInfo:nil repeats:TRUE];
+	
+	self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:self.updateInterval.floatValue target:self selector:@selector(update) userInfo:nil repeats:TRUE];
+	
+	//self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f/30.0f target:self selector:@selector(update) userInfo:nil repeats:TRUE];
+	
 	if(self.updateInterval.floatValue == 1 || self.updateInterval.floatValue == 2) {
 		self.updateIntervalLabel.stringValue = [NSString stringWithFormat:@"%li Seconds", self.updateInterval.integerValue];
 	} else {
 		self.updateIntervalLabel.stringValue = [NSString stringWithFormat:@"%0.2f Seconds", self.updateInterval.floatValue];
 	}
+	
 	[[NSUserDefaults standardUserDefaults] setObject:@(self.updateInterval.floatValue) forKey:UpdateInterval];
 }
 
@@ -449,7 +482,8 @@ static struct pixel * pixels = NULL;
 	lightState.x = @(xy.x);
 	lightState.y = @(xy.y);
 	lightState.on = @(self.lightState);
-	lightState.transitionTime = @(self.updateInterval.floatValue * 10);
+	//lightState.transitionTime = @(self.updateInterval.floatValue * 10);
+	//lightState.transitionTime = @(2.5);
 	lightState.brightness = @(self.brightness.integerValue);
 	
 	// Create PHBridgeSendAPI object
