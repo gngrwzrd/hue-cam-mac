@@ -6,6 +6,8 @@
 static NSString * const BridgeConnected = @"BridgeConnected";
 static NSString * const UpdateInterval = @"UpdateInterval";
 static NSString * const Brightness = @"Brightness";
+static NSString * const Saturation = @"Saturation";
+static NSString * const HueBrightness = @"HueBrightness";
 
 struct pixel {
 	unsigned char r, g, b, a;
@@ -61,13 +63,17 @@ struct pixel {
 	self.cropSelector.layer.zPosition = 20;
 	
 	NSMutableDictionary * defaults = [NSMutableDictionary dictionary];
-	defaults[UpdateInterval] = @(1);
-	defaults[Brightness] = @(254);
+	defaults[UpdateInterval] = @(.25);
+	defaults[Brightness] = @(125);
+	defaults[Saturation] = @(.5);
+	defaults[HueBrightness] = @(125);
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 	
 	self.updateInterval.floatValue = [[[NSUserDefaults standardUserDefaults] objectForKey:UpdateInterval] floatValue];
-	self.brightness.integerValue = [[[NSUserDefaults standardUserDefaults] objectForKey:Brightness] integerValue];
+	self.brightness.floatValue = [[[NSUserDefaults standardUserDefaults] objectForKey:Brightness] floatValue];
+	self.hueBrightness.integerValue = [[[NSUserDefaults standardUserDefaults] objectForKey:HueBrightness] integerValue];
+	self.saturationSlider.floatValue = [[[NSUserDefaults standardUserDefaults] objectForKey:Saturation] floatValue];
 }
 
 - (void) setupCapture {
@@ -300,17 +306,22 @@ static struct pixel * pixels = NULL;
 			
 			red /= numberOfPixels;
 			green /= numberOfPixels;
-			blue/= numberOfPixels;
+			blue /= numberOfPixels;
 			
 			CGContextRelease(context);
 		}
 		
 		CGFloat h,s,b,a;
+		
 		NSColor * tmp = [NSColor colorWithRed:red/255.0f green:green/255.0f blue:blue/255.0f alpha:1.0f];
 		[tmp getHue:&h saturation:&s brightness:&b alpha:&a];
 		
 		if(s < self.saturationSlider.floatValue) {
 			s = self.saturationSlider.floatValue;
+		}
+		
+		if(b < self.brightness.floatValue) {
+			b = self.brightness.floatValue;
 		}
 		
 		self.currentColor = [NSColor colorWithHue:h saturation:s brightness:b alpha:a];
@@ -342,14 +353,22 @@ static struct pixel * pixels = NULL;
 	[[NSUserDefaults standardUserDefaults] setObject:@(self.updateInterval.floatValue) forKey:UpdateInterval];
 }
 
+- (IBAction) updateSaturation:(id) sender {
+	[[NSUserDefaults standardUserDefaults] setObject:@(self.saturationSlider.floatValue) forKey:Saturation];
+}
+
 - (IBAction) updateBrightness:(id)sender {
 	[[NSUserDefaults standardUserDefaults] setObject:@(self.brightness.floatValue) forKey:Brightness];
+}
+
+- (IBAction) updateHueBrightness:(id) sender {
+	[[NSUserDefaults standardUserDefaults] setObject:@(self.hueBrightness.integerValue) forKey:HueBrightness];
 	
 	PHBridgeResourcesCache * cache = [PHBridgeResourcesReader readBridgeResourcesCache];
 	PHLight * light = [cache.lights objectForKey:@"1"];
 	
 	PHLightState * state = [[PHLightState alloc] init];
-	state.brightness = @(self.brightness.integerValue);
+	state.brightness = @(self.hueBrightness.integerValue);
 	
 	// Create PHBridgeSendAPI object
 	PHBridgeSendAPI * bridgeSendAPI = [[PHBridgeSendAPI alloc] init];
@@ -429,9 +448,7 @@ static struct pixel * pixels = NULL;
 	lightState.x = @(xy.x);
 	lightState.y = @(xy.y);
 	lightState.on = @(self.lightState);
-	//lightState.transitionTime = @(self.updateInterval.floatValue * 10);
-	//lightState.transitionTime = @(2.5);
-	lightState.brightness = @(self.brightness.integerValue);
+	lightState.brightness = @(self.hueBrightness.integerValue);
 	
 	// Create PHBridgeSendAPI object
 	PHBridgeSendAPI * bridgeSendAPI = [[PHBridgeSendAPI alloc] init];
