@@ -4,10 +4,6 @@
 #import "CCColorCube.h"
 
 static NSString * const BridgeConnected = @"BridgeConnected";
-static NSString * const DarkColors = @"DarkColors";
-static NSString * const BrightColors = @"BrightColors";
-static NSString * const AvoidBlack = @"AvoidBlack";
-static NSString * const AvoidWhite = @"AvoidWhite";
 static NSString * const UpdateInterval = @"UpdateInterval";
 static NSString * const Brightness = @"Brightness";
 
@@ -54,6 +50,10 @@ struct pixel {
 }
 
 - (void) setupUI {
+	self.currentColorView.wantsLayer = TRUE;
+	self.currentColorView.layer.borderColor = [[NSColor whiteColor] CGColor];
+	self.currentColorView.layer.borderWidth = 2;
+	
 	self.preview.wantsLayer = TRUE;
 	self.preview.layer.zPosition = 5;
 	
@@ -61,19 +61,11 @@ struct pixel {
 	self.cropSelector.layer.zPosition = 20;
 	
 	NSMutableDictionary * defaults = [NSMutableDictionary dictionary];
-	defaults[AvoidBlack] = @(TRUE);
-	defaults[AvoidWhite] = @(TRUE);
-	defaults[BrightColors] = @(TRUE);
-	defaults[DarkColors] = @(FALSE);
 	defaults[UpdateInterval] = @(1);
 	defaults[Brightness] = @(254);
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 	
-	self.avoidBlack.state = [[NSUserDefaults standardUserDefaults] boolForKey:AvoidBlack];
-	self.avoidWhite.state = [[NSUserDefaults standardUserDefaults] boolForKey:AvoidWhite];
-	self.brightColors.state = [[NSUserDefaults standardUserDefaults] boolForKey:BrightColors];
-	self.darkColors.state = [[NSUserDefaults standardUserDefaults] boolForKey:DarkColors];
 	self.updateInterval.floatValue = [[[NSUserDefaults standardUserDefaults] objectForKey:UpdateInterval] floatValue];
 	self.brightness.integerValue = [[[NSUserDefaults standardUserDefaults] objectForKey:Brightness] integerValue];
 }
@@ -270,24 +262,9 @@ static struct pixel * pixels = NULL;
 
 - (void) updateDominantColorUsingColorCube {
 	int flags = 0;
-	
-	if(self.avoidBlack.state == NSOnState) {
-		flags |= CCAvoidBlack;
-	}
-	if(self.avoidWhite.state == NSOnState) {
-		flags |= CCAvoidWhite;
-	}
-	if(self.brightColors.state == NSOnState) {
-		flags |= CCOnlyBrightColors;
-	}
-	if(self.darkColors.state == NSOnState) {
-		flags |= CCOnlyDarkColors;
-	}
-	
 	NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame flags:flags count:1];
 	if(colors.count > 0) {
 		self.currentColor = [colors objectAtIndex:0];
-		NSLog(@"color: %@",colors[0]);
 	}
 }
 
@@ -316,10 +293,6 @@ static struct pixel * pixels = NULL;
 					continue;
 				}
 				
-//				if(pixels[i].r < 50 && pixels[i].g < 50 && pixels[i].b < 50) {
-//					continue;
-//				}
-				
 				red += pixels[i].r;
 				green += pixels[i].g;
 				blue += pixels[i].b;
@@ -332,23 +305,19 @@ static struct pixel * pixels = NULL;
 			CGContextRelease(context);
 		}
 		
-		self.currentColor = [NSColor colorWithRed:red/255.0f green:green/255.0f blue:blue/255.0f alpha:1.0f];
-		
 		CGFloat h,s,b,a;
-		[self.currentColor getHue:&h saturation:&s brightness:&b alpha:&a];
+		NSColor * tmp = [NSColor colorWithRed:red/255.0f green:green/255.0f blue:blue/255.0f alpha:1.0f];
+		[tmp getHue:&h saturation:&s brightness:&b alpha:&a];
 		
-		if(s < .3) {
-			//NSLog(@"saturating more!");
-			s = .3;
-		}
-		
-		if(b > .8) {
-			b = .6;
+		if(s < self.saturationSlider.floatValue) {
+			s = self.saturationSlider.floatValue;
 		}
 		
 		self.currentColor = [NSColor colorWithHue:h saturation:s brightness:b alpha:a];
 		
-		//NSLog(@"saturation: %f",self.currentColor.saturationComponent);
+		dispatch_async(dispatch_get_main_queue(), ^{
+			self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
+		});
 	}
 }
 
@@ -359,26 +328,10 @@ static struct pixel * pixels = NULL;
 	[self changeHueToColor:self.currentColor];
 }
 
-- (IBAction) radioUpdate:(id) sender {
-	NSArray * radios = @[self.darkColors,self.brightColors];
-	for(NSButton * button in radios) {
-		if(button == sender) {
-			button.state = NSOnState;
-		} else {
-			button.state = NSOffState;
-		}
-	}
-	
-	[[NSUserDefaults standardUserDefaults] setObject:@(self.darkColors.state) forKey:DarkColors];
-	[[NSUserDefaults standardUserDefaults] setObject:@(self.brightColors.state) forKey:BrightColors];
-}
-
 - (IBAction) intervalUpdate:(id) sender {
 	[self.updateIntervalTimer invalidate];
 	
 	self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:self.updateInterval.floatValue target:self selector:@selector(update) userInfo:nil repeats:TRUE];
-	
-	//self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f/30.0f target:self selector:@selector(update) userInfo:nil repeats:TRUE];
 	
 	if(self.updateInterval.floatValue == 1 || self.updateInterval.floatValue == 2) {
 		self.updateIntervalLabel.stringValue = [NSString stringWithFormat:@"%li Seconds", self.updateInterval.integerValue];
@@ -442,15 +395,9 @@ static struct pixel * pixels = NULL;
 	}
 }
 
-- (IBAction) avoidColors:(id) sender {
-	[[NSUserDefaults standardUserDefaults] setObject:@(self.avoidBlack.state) forKey:AvoidBlack];
-	[[NSUserDefaults standardUserDefaults] setObject:@(self.avoidWhite.state) forKey:AvoidWhite];
-}
-
 - (void) localConnection {
 	self.canChangeColor = TRUE;
 	self.connectionMessage.stringValue = @"Connected";
-	
 	self.connectionButton.hidden = TRUE;
 	
 	PHBridgeResourcesCache * cache = [PHBridgeResourcesReader readBridgeResourcesCache];
