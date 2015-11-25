@@ -13,6 +13,8 @@ struct pixel {
 	unsigned char r, g, b, a;
 };
 
+static struct pixel * pixels = NULL;
+
 @interface AppDelegate ()
 @property (weak) IBOutlet NSWindow * window;
 
@@ -25,9 +27,6 @@ struct pixel {
 @property AVCaptureSession * session;
 @property dispatch_queue_t sampleQueue;
 
-@property NSImage * currentFrame;
-@property CGImageRef currentCGFrame;
-
 @property NSImage * croppedImageFrame;
 @property CGImageRef croppedImageCGFrame;
 
@@ -35,15 +34,12 @@ struct pixel {
 @property NSTimer * updateIntervalTimer;
 @property CGRect cropRect;
 
-@property CCColorCube * colorCube;
-
 @end
 
 @implementation AppDelegate
 
 - (void) applicationDidFinishLaunching:(NSNotification *) aNotification {
 	self.canChangeColor = FALSE;
-	self.colorCube = [[CCColorCube alloc] init];
 	[self setupUI];
 	[self setupSDK];
 	[self setupCapture];
@@ -62,10 +58,10 @@ struct pixel {
 	self.cropSelector.layer.zPosition = 20;
 	
 	NSMutableDictionary * defaults = [NSMutableDictionary dictionary];
-	defaults[UpdateInterval] = @(.25);
-	defaults[Brightness] = @(125);
-	defaults[Saturation] = @(.5);
-	defaults[HueBrightness] = @(125);
+	defaults[UpdateInterval] = @(1);
+	defaults[Brightness] = @(.35);
+	defaults[Saturation] = @(.6);
+	defaults[HueBrightness] = @(38);
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 	
@@ -73,6 +69,11 @@ struct pixel {
 	self.brightness.floatValue = [[[NSUserDefaults standardUserDefaults] objectForKey:Brightness] floatValue];
 	self.hueBrightness.integerValue = [[[NSUserDefaults standardUserDefaults] objectForKey:HueBrightness] integerValue];
 	self.saturationSlider.floatValue = [[[NSUserDefaults standardUserDefaults] objectForKey:Saturation] floatValue];
+	
+	NSLog(@"%f",self.updateInterval.floatValue);
+	NSLog(@"%f",self.brightness.floatValue);
+	NSLog(@"%f",self.saturationSlider.floatValue);
+	NSLog(@"%f",self.hueBrightness.floatValue);
 }
 
 - (void) setupCapture {
@@ -116,11 +117,12 @@ struct pixel {
 - (void) captureOutput:(AVCaptureOutput *) captureOutput didOutputSampleBuffer:(CMSampleBufferRef) sampleBuffer fromConnection:(AVCaptureConnection *) connection {
 	[self updateCurrentFrameFromSampleBuffer:sampleBuffer];
 	[self updateDominantColorForCurrentFrame];
+	//[self updateColorFromColorCubte];
 }
 
 - (void) setupSDK {
 	self.sdk = [[PHHueSDK alloc] init];
-	[self.sdk enableLogging:TRUE];
+	//[self.sdk enableLogging:TRUE];
 	[self.sdk startUpSDK];
 	
 	if([[NSUserDefaults standardUserDefaults] boolForKey:BridgeConnected]) {
@@ -197,9 +199,6 @@ struct pixel {
 
 #pragma mark utils
 
-static CGContextRef _context;
-static CGColorSpaceRef _colorSpace;
-
 - (void) updateCurrentFrameFromSampleBuffer:(CMSampleBufferRef) sampleBuffer {
 	// Get a CMSampleBuffer's Core Video image buffer for the media data
 	CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
@@ -217,31 +216,22 @@ static CGColorSpaceRef _colorSpace;
 	size_t width = CVPixelBufferGetWidth(imageBuffer);
 	size_t height = CVPixelBufferGetHeight(imageBuffer);
 	
-	// Create a device-dependent RGB color space
-	if(!_colorSpace) {
-		_colorSpace = CGColorSpaceCreateDeviceRGB();
-	}
+	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 	
-	if(!_context) {
-		// Create a bitmap graphics context with the sample buffer data
-		_context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, _colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-	}
+	CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
 	
 	// Create a Quartz image from the pixel data in the bitmap graphics context
-	CGImageRef quartzImage = CGBitmapContextCreateImage(_context);
+	CGImageRef quartzImage = CGBitmapContextCreateImage(context);
 	
 	// Unlock the pixel buffer
 	CVPixelBufferUnlockBaseAddress(imageBuffer,0);
 	
 	// Free up the context and color space
-	//CGContextRelease(context);
-	//CGColorSpaceRelease(colorSpace);
+	CGContextRelease(context);
+	CGColorSpaceRelease(colorSpace);
 	
 	// Create an image object from the Quartz image
 	NSImage * image = [[NSImage alloc] initWithCGImage:quartzImage size:NSMakeSize(width, height)];
-	
-	self.currentFrame = image;
-	self.currentCGFrame = quartzImage;
 	
 	// Release the Quartz image
 	CGImageRelease(quartzImage);
@@ -250,8 +240,8 @@ static CGColorSpaceRef _colorSpace;
 	CGRect cropRect = self.cropSelector.cropRect;
 	CGFloat diffx = image.size.width / self.cropSelector.frame.size.width;
 	CGFloat diffy = image.size.height / self.cropSelector.frame.size.height;
-	cropRect.origin.x = floorf(cropRect.origin.x * diffx);
-	cropRect.origin.y = floorf(cropRect.origin.y * diffy);
+	cropRect.origin.x = floorf( cropRect.origin.x * diffx );
+	cropRect.origin.y = floorf( cropRect.origin.y * diffy );
 	cropRect.size.width = floorf( cropRect.size.width * diffx );
 	cropRect.size.height = floorf( cropRect.size.height * diffy );
 	
@@ -264,16 +254,26 @@ static CGColorSpaceRef _colorSpace;
 	
 	NSRect rect = NSMakeRect(0, 0, cropRect.size.width,cropRect.size.height);
 	self.croppedImageCGFrame = [croppedImage CGImageForProposedRect:&rect context:NULL hints:NULL];
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		self.croppedImagePreview.image = self.croppedImageFrame;
+	});
 }
 
-static struct pixel * pixels = NULL;
-
-- (void) updateDominantColorUsingColorCube {
+- (void) updateColorFromColorCubte {
+	CCColorCube * cube = [[CCColorCube alloc] init];
 	int flags = 0;
-	NSArray * colors = [self.colorCube extractColorsFromImage:self.croppedImageFrame flags:flags count:1];
+	flags |= CCAvoidBlack;
+	flags |= CCAvoidWhite;
+	flags |= CCOnlyBrightColors;
+	NSArray * colors = [cube extractColorsFromImage:self.croppedImageFrame flags:flags count:1];
 	if(colors.count > 0) {
-		self.currentColor = [colors objectAtIndex:0];
+		self.currentColor = colors[0];
 	}
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
+	});
 }
 
 - (void) updateDominantColorForCurrentFrame {
@@ -298,6 +298,7 @@ static struct pixel * pixels = NULL;
 			for(int i = 0; i < numberOfPixels; i++) {
 				
 				if(pixels[i].r > 100 && pixels[i].g > 100 && pixels[i].b > 100) {
+					//NSLog(@"too bright");
 					continue;
 				}
 				
@@ -336,7 +337,15 @@ static struct pixel * pixels = NULL;
 
 #pragma mark local connection callbacks
 
+static int _log = 0;
+
 - (void) update {
+	_log++;
+	if(_log == 20) {
+		_log = 0;
+		NSLog(@"update");
+		NSLog(@"current color: %@",self.currentColor);
+	}
 	[self changeHueToColor:self.currentColor];
 }
 
@@ -345,7 +354,7 @@ static struct pixel * pixels = NULL;
 	
 	self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:self.updateInterval.floatValue target:self selector:@selector(update) userInfo:nil repeats:TRUE];
 	
-	//self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f/5.0f target:self selector:@selector(update) userInfo:nil repeats:TRUE];
+	//self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f/6.0f target:self selector:@selector(update) userInfo:nil repeats:TRUE];
 	
 	if(self.updateInterval.floatValue == 1 || self.updateInterval.floatValue == 2) {
 		self.updateIntervalLabel.stringValue = [NSString stringWithFormat:@"%li Seconds", self.updateInterval.integerValue];
@@ -452,6 +461,7 @@ static struct pixel * pixels = NULL;
 	lightState.y = @(xy.y);
 	lightState.on = @(self.lightState);
 	lightState.brightness = @(self.hueBrightness.integerValue);
+	//lightState.transitionTime = @(2.5);
 	
 	// Create PHBridgeSendAPI object
 	PHBridgeSendAPI * bridgeSendAPI = [[PHBridgeSendAPI alloc] init];

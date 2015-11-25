@@ -20,37 +20,28 @@ NSString * const CropSelectorCropRect = @"CropSelectorCropRect";
 
 @implementation CropSelector
 
-- (BOOL) isFlipped {
-	return TRUE;
-}
-
 - (void) awakeFromNib {
 	self.cropRect = CGRectInset(self.bounds,2,2);
-	self.topLeftHandle = CGRectMake(0,0,HandleSize,HandleSize);
-	self.bottomRightHandle = CGRectMake(self.bounds.size.width-HandleSize,self.bounds.size.height-HandleSize,HandleSize,HandleSize);
+	self.topLeftHandle = CGRectMake(0,self.bounds.size.height-HandleSize,HandleSize,HandleSize);
+	self.bottomRightHandle = CGRectMake(self.bounds.size.width-HandleSize,0,HandleSize,HandleSize);
 	self.currentHandle = NoHandle;
 	
 	if([[NSUserDefaults standardUserDefaults] objectForKey:CropSelectorCropRect]) {
 		self.cropRect = NSRectFromString([[NSUserDefaults standardUserDefaults] objectForKey:CropSelectorCropRect]);
-		self.topLeftHandle = CGRectMake(self.cropRect.origin.x,self.cropRect.origin.y,HandleSize,HandleSize);
-		self.bottomRightHandle = CGRectMake((self.topLeftHandle.origin.x + self.cropRect.size.width) - HandleSize, (self.topLeftHandle.origin.y + self.cropRect.size.height) - HandleSize, HandleSize, HandleSize);
+		
+		CGFloat height = self.cropRect.size.height;
+		CGFloat width = self.cropRect.size.width;
+		
+		self.topLeftHandle = CGRectMake(
+			self.cropRect.origin.x,
+			(self.cropRect.origin.y+height)-HandleSize,
+			HandleSize,HandleSize);
+		
+		self.bottomRightHandle = CGRectMake(
+			(self.topLeftHandle.origin.x + width) - HandleSize,
+			self.cropRect.origin.y,
+			HandleSize, HandleSize);
 	}
-}
-
-- (CGRect) rectForMiddleOval {
-	
-	CGRect oval = CGRectZero;
-	
-	CGFloat width = self.bottomRightHandle.origin.x - self.topLeftHandle.origin.x;
-	CGFloat height = self.bottomRightHandle.origin.y - self.topLeftHandle.origin.y;
-	
-	oval.origin.x = ((self.topLeftHandle.origin.x) + width / 2) - 5;
-	oval.origin.y = ((self.topLeftHandle.origin.y) + height / 2) -  5;
-	oval.size.width = 20;
-	oval.size.height = 20;
-	
-	return oval;
-	
 }
 
 - (void) drawRect:(NSRect) dirtyRect {
@@ -105,6 +96,8 @@ NSString * const CropSelectorCropRect = @"CropSelectorCropRect";
 	CGFloat xdiff = location.x - self.currentLocation.x;
 	CGFloat ydiff = location.y - self.currentLocation.y;
 	
+	NSLog(@"ydiff: %f",ydiff);
+	
 	if(self.currentHandle == LeftHandleId) {
 		CGPoint currentHandlePoint = self.topLeftHandle.origin;
 		CGPoint leftHandlePoint = CGPointMake( currentHandlePoint.x + xdiff, currentHandlePoint.y + ydiff);
@@ -129,8 +122,8 @@ NSString * const CropSelectorCropRect = @"CropSelectorCropRect";
 	}
 	
 	CGFloat width = (self.bottomRightHandle.origin.x - self.topLeftHandle.origin.x) + HandleSize;
-	CGFloat height = (self.bottomRightHandle.origin.y - self.topLeftHandle.origin.y) + HandleSize;
-	CGRect cropRect = CGRectMake(self.topLeftHandle.origin.x,self.topLeftHandle.origin.y, width, height);
+	CGFloat height = (self.topLeftHandle.origin.y - self.bottomRightHandle.origin.y) + HandleSize;
+	CGRect cropRect = CGRectMake(self.topLeftHandle.origin.x,self.bottomRightHandle.origin.y, width, height);
 	self.cropRect = cropRect;
 	
 	self.currentLocation = location;

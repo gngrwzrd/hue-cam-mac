@@ -2,6 +2,7 @@
 #import <Cocoa/Cocoa.h>
 #import <AVFoundation/AVFoundation.h>
 #import "CropSelector.h"
+#import <CoreImage/CoreImage.h>
 
 @interface AppDelegate : NSObject <NSApplicationDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
 
@@ -20,4 +21,6 @@
 @property (weak) IBOutlet NSButton * powerButton;
 
 @property IBOutlet CropSelector * cropSelector;
+
+@property IBOutlet NSImageView * croppedImagePreview;
 @end

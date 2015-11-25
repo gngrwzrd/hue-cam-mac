@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0735A27F1C054E66008F3365 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0735A27E1C054E66008F3365 /* CoreImage.framework */; };
 		07AEAF221C0211F90065516B /* CCColorCube.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AEAF1F1C0211F90065516B /* CCColorCube.m */; };
 		07AEAF231C0211F90065516B /* CCLocalMaximum.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AEAF211C0211F90065516B /* CCLocalMaximum.m */; };
 		07B9F9701C00EAA800A7F67E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F96F1C00EAA800A7F67E /* AppDelegate.m */; };
@@ -27,6 +28,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0735A27E1C054E66008F3365 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		07AEAF1E1C0211F90065516B /* CCColorCube.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCColorCube.h; path = "libs/ColorCube-master/ColorCube/ColorCube/CCColorCube.h"; sourceTree = SOURCE_ROOT; };
 		07AEAF1F1C0211F90065516B /* CCColorCube.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCColorCube.m; path = "libs/ColorCube-master/ColorCube/ColorCube/CCColorCube.m"; sourceTree = SOURCE_ROOT; };
 		07AEAF201C0211F90065516B /* CCLocalMaximum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCLocalMaximum.h; path = "libs/ColorCube-master/ColorCube/ColorCube/CCLocalMaximum.h"; sourceTree = SOURCE_ROOT; };
@@ -64,6 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0735A27F1C054E66008F3365 /* CoreImage.framework in Frameworks */,
 				07B9F99C1C00F59100A7F67E /* AVFoundation.framework in Frameworks */,
 				07B9F99A1C00EAD800A7F67E /* SystemConfiguration.framework in Frameworks */,
 				07B9F9811C00EACB00A7F67E /* HueSDK_OSX.framework in Frameworks */,
@@ -96,6 +99,7 @@
 		07B9F9621C00EAA800A7F67E = {
 			isa = PBXGroup;
 			children = (
+				0735A27E1C054E66008F3365 /* CoreImage.framework */,
 				07B9F96D1C00EAA800A7F67E /* HueCam */,
 				07B9F96C1C00EAA800A7F67E /* Products */,
 			);
