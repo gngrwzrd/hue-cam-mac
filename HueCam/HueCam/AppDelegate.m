@@ -255,9 +255,9 @@ static struct pixel * pixels = NULL;
 	NSRect rect = NSMakeRect(0, 0, cropRect.size.width,cropRect.size.height);
 	self.croppedImageCGFrame = [croppedImage CGImageForProposedRect:&rect context:NULL hints:NULL];
 	
-	dispatch_async(dispatch_get_main_queue(), ^{
-		self.croppedImagePreview.image = self.croppedImageFrame;
-	});
+//	dispatch_async(dispatch_get_main_queue(), ^{
+//		self.croppedImagePreview.image = self.croppedImageFrame;
+//	});
 }
 
 - (void) updateColorFromColorCubte {
