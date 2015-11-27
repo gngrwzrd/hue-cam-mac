@@ -138,7 +138,7 @@ static CGContextRef _context;
 	self.cropSelector.layer.zPosition = 20;
 	
 	NSMutableDictionary * defaults = [NSMutableDictionary dictionary];
-	defaults[UpdateInterval] = @(1);
+	defaults[UpdateInterval] = @(.75);
 	defaults[Brightness] = @(.35);
 	defaults[Saturation] = @(.6);
 	defaults[HueBrightness] = @(38);
