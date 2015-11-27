@@ -34,16 +34,95 @@ static struct pixel * pixels = NULL;
 @property NSTimer * updateIntervalTimer;
 @property CGRect cropRect;
 
+@property CGFloat redHue;
+@property CGFloat redPurpleHue;
+@property CGFloat purpleHue;
+@property CGFloat bluePurpleHue;
+@property CGFloat blueHue;
+@property CGFloat blueGreenHue;
+@property CGFloat greenHue;
+@property CGFloat greenYellowHue;
+@property CGFloat yellowHue;
+@property CGFloat yellowOrangeHue;
+@property CGFloat orangeHue;
+@property CGFloat orangeRedHue;
+
 @end
 
 @implementation AppDelegate
 
 - (void) applicationDidFinishLaunching:(NSNotification *) aNotification {
 	self.canChangeColor = FALSE;
+	[self logColors];
 	[self setupUI];
 	[self setupSDK];
 	[self setupCapture];
 	[self intervalUpdate:nil];
+}
+
+- (void) logColors {
+	CGFloat h,s,b;
+	
+	self.redHue = 1.0;
+	self.redPurpleHue = .87;
+	self.purpleHue = .83;
+	self.bluePurpleHue = .72;
+	self.blueHue = .66;
+	self.blueGreenHue = .49;
+	self.greenHue = .33;
+	self.greenYellowHue = .26;
+	self.yellowHue = .16;
+	self.yellowOrangeHue = .12;
+	self.orangeHue = .083;
+	self.orangeRedHue = .049;
+	
+	NSColor * red = [NSColor redColor];
+	[red getHue:&h saturation:&s brightness:&b alpha:nil];
+	NSLog(@"red: %f %f %f",h,s,b);
+	
+	NSColor * redPurple = [NSColor colorWithRed:0.979 green:0.215 blue:0.807 alpha:1];
+	[redPurple getHue:&h saturation:&s brightness:&b alpha:nil];
+	NSLog(@"redPurple: %f %f %f",h,s,b);
+	
+	NSColor * purple = [NSColor purpleColor];
+	[purple getHue:&h saturation:&s brightness:&b alpha:nil];
+	NSLog(@"purple: %f %f %f",h,s,b);
+	
+	NSColor * bluePurple = [NSColor colorWithRed:0.478 green:0.202 blue:0.97 alpha:1];
+	[bluePurple getHue:&h saturation:&s brightness:&b alpha:nil];
+	NSLog(@"bluePurple: %f %f %f",h,s,b);
+	
+	NSColor * blue = [NSColor blueColor];
+	[blue getHue:&h saturation:&s brightness:&b alpha:nil];
+	NSLog(@"blue: %f %f %f",h,s,b);
+	
+	NSColor * blueGreen = [NSColor colorWithRed:0.034 green:0.614 blue:0.581 alpha:1];
+	[blueGreen getHue:&h saturation:&s brightness:&b alpha:nil];
+	NSLog(@"blueGreen: %f %f %f",h,s,b);
+	
+	NSColor * green = [NSColor greenColor];
+	[green getHue:&h saturation:&s brightness:&b alpha:nil];
+	NSLog(@"green: %f %f %f",h,s,b);
+	
+	NSColor * greenYellow = [NSColor colorWithRed:0.414 green:0.932 blue:0.063 alpha:1];
+	[greenYellow getHue:&h saturation:&s brightness:&b alpha:nil];
+	NSLog(@"greenYellow: %f %f %f",h,s,b);
+	
+	NSColor * yellow = [NSColor yellowColor];
+	[yellow getHue:&h saturation:&s brightness:&b alpha:nil];
+	NSLog(@"yellow: %f %f %f",h,s,b);
+	
+	NSColor * yellowOrange = [NSColor colorWithRed:0.982 green:0.741 blue:0.006 alpha:1];
+	[yellowOrange getHue:&h saturation:&s brightness:&b alpha:nil];
+	NSLog(@"yellowOrange: %f %f %f",h,s,b);
+	
+	NSColor * orange = [NSColor orangeColor];
+	[orange getHue:&h saturation:&s brightness:&b alpha:nil];
+	NSLog(@"orange: %f %f %f",h,s,b);
+	
+	NSColor * orangeRed = [NSColor colorWithRed:0.994 green:0.326 blue:0.046 alpha:1];
+	[orangeRed getHue:&h saturation:&s brightness:&b alpha:nil];
+	NSLog(@"orangeRed: %f %f %f",h,s,b);
 }
 
 - (void) setupUI {
@@ -288,6 +367,15 @@ static struct pixel * pixels = NULL;
 	NSUInteger green = 0;
 	NSUInteger blue = 0;
 	
+	NSUInteger redAccumulator = 0;
+	NSUInteger redCounter = 0;
+	
+	NSUInteger blueAccumulator = 0;
+	NSUInteger blueCounter = 0;
+	
+	NSUInteger greenAccumulator = 0;
+	NSUInteger greenCounter = 0;
+	
 	if(pixels != nil) {
 		CGContextRef context = CGBitmapContextCreate((void*)pixels,image.size.width,image.size.height,8,image.size.width * 4,CGImageGetColorSpace(cgimage),kCGImageAlphaPremultipliedLast);
 		if(context != NULL) {
@@ -297,22 +385,67 @@ static struct pixel * pixels = NULL;
 			
 			for(int i = 0; i < numberOfPixels; i++) {
 				
-				if(pixels[i].r > 100 && pixels[i].g > 100 && pixels[i].b > 100) {
-					//NSLog(@"too bright");
-					continue;
+				//if(pixels[i].r > 100 && pixels[i].g > 100 && pixels[i].b > 100) {
+				//	continue;
+				//}
+				
+				//red += pixels[i].r;
+				//green += pixels[i].g;
+				//blue += pixels[i].b;
+				
+				NSColor * color = [NSColor colorWithRed:pixels[i].r green:pixels[i].g blue:pixels[i].b alpha:1];
+				
+				CGFloat h,s,b;
+				[color getHue:&h saturation:&s brightness:&b alpha:nil];
+				
+				if(h > .98 || (h > self.orangeRedHue && h < self.yellowHue)) {
+					redAccumulator += pixels[i].r;
+					redCounter++;
 				}
 				
-				red += pixels[i].r;
-				green += pixels[i].g;
-				blue += pixels[i].b;
+				else if(h > self.yellowHue && h < self.blueGreenHue) {
+					greenAccumulator += pixels[i].g;
+					greenCounter++;
+				}
+				
+				else if(h > self.self.greenHue && h < self.redPurpleHue) {
+					blueAccumulator += pixels[i].b;
+					blueAccumulator++;
+				}
+				
 			}
 			
-			red /= numberOfPixels;
-			green /= numberOfPixels;
-			blue /= numberOfPixels;
+			//red /= numberOfPixels;
+			//green /= numberOfPixels;
+			//blue /= numberOfPixels;
+			
+			if(redCounter > 0) {
+				if(redCounter > blueCounter && redCounter > greenCounter) {
+					red = redAccumulator / redCounter;
+				} else {
+					red = redAccumulator / (redCounter*2);
+				}
+			}
+			
+			if(greenCounter > 0) {
+				if(greenCounter > blueCounter && greenCounter > redCounter) {
+					green = greenAccumulator / greenCounter;
+				} else {
+					green = (greenAccumulator / (greenCounter*2));
+				}
+			}
+			
+			if(blueCounter > 0) {
+				if(blueCounter > greenCounter && blueCounter > redCounter) {
+					blue = blueAccumulator / blueCounter;
+				} else {
+					blue = blueAccumulator / (blueCounter*2);
+				}
+			}
 			
 			CGContextRelease(context);
 		}
+		
 		
 		CGFloat h,s,b,a;
 		
@@ -449,6 +582,14 @@ static int _log = 0;
 }
 
 - (void) changeHueToColor:(NSColor *) color {
+	
+	CGFloat h,s,b;
+	[self.currentColor getHue:&h saturation:&s brightness:&b alpha:nil];
+	
+	NSLog(@"change color to: %f %f %f",h,s,b);
+	
+	return;
+	
 	if(!self.canChangeColor || !self.lightState) {
 		return;
 	}
