@@ -8,4 +8,4 @@ Power on / off the Hue light.
 
 Currently it will only connect to one bridge and use the first light it finds.
 
-![Screen Shot](http://gngrwzrd.com/hue-cam-mac/screenshot-1.png)
+![Screen Shot](http://gngrwzrd.com/hue-cam-mac/screenshot-2.png)
