@@ -10,6 +10,7 @@
 		0735A27F1C054E66008F3365 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0735A27E1C054E66008F3365 /* CoreImage.framework */; };
 		07AEAF221C0211F90065516B /* CCColorCube.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AEAF1F1C0211F90065516B /* CCColorCube.m */; };
 		07AEAF231C0211F90065516B /* CCLocalMaximum.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AEAF211C0211F90065516B /* CCLocalMaximum.m */; };
+		07AEAF261C08C4A20065516B /* blue-yellow.png in Resources */ = {isa = PBXBuildFile; fileRef = 07AEAF251C08C4A20065516B /* blue-yellow.png */; };
 		07B9F9701C00EAA800A7F67E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F96F1C00EAA800A7F67E /* AppDelegate.m */; };
 		07B9F9731C00EAA800A7F67E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B9F9721C00EAA800A7F67E /* main.m */; };
 		07B9F9751C00EAA800A7F67E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07B9F9741C00EAA800A7F67E /* Assets.xcassets */; };
@@ -33,6 +34,7 @@
 		07AEAF1F1C0211F90065516B /* CCColorCube.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCColorCube.m; path = "libs/ColorCube-master/ColorCube/ColorCube/CCColorCube.m"; sourceTree = SOURCE_ROOT; };
 		07AEAF201C0211F90065516B /* CCLocalMaximum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCLocalMaximum.h; path = "libs/ColorCube-master/ColorCube/ColorCube/CCLocalMaximum.h"; sourceTree = SOURCE_ROOT; };
 		07AEAF211C0211F90065516B /* CCLocalMaximum.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCLocalMaximum.m; path = "libs/ColorCube-master/ColorCube/ColorCube/CCLocalMaximum.m"; sourceTree = SOURCE_ROOT; };
+		07AEAF251C08C4A20065516B /* blue-yellow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "blue-yellow.png"; path = "images/blue-yellow.png"; sourceTree = "<group>"; };
 		07B9F96B1C00EAA800A7F67E /* HueCam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HueCam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		07B9F96E1C00EAA800A7F67E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		07B9F96F1C00EAA800A7F67E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -90,6 +92,7 @@
 		07AEAF241C0215F50065516B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				07AEAF251C08C4A20065516B /* blue-yellow.png */,
 				07B9F9791C00EAA800A7F67E /* Info.plist */,
 				07B9F9741C00EAA800A7F67E /* Assets.xcassets */,
 			);
@@ -237,6 +240,7 @@
 			files = (
 				07B9F9751C00EAA800A7F67E /* Assets.xcassets in Resources */,
 				07B9F9781C00EAA800A7F67E /* MainMenu.xib in Resources */,
+				07AEAF261C08C4A20065516B /* blue-yellow.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -23,4 +23,5 @@
 @property IBOutlet CropSelector * cropSelector;
 
 @property IBOutlet NSImageView * croppedImagePreview;
+
 @end

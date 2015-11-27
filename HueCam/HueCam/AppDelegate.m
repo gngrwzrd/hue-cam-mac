@@ -195,8 +195,9 @@ static struct pixel * pixels = NULL;
 
 - (void) captureOutput:(AVCaptureOutput *) captureOutput didOutputSampleBuffer:(CMSampleBufferRef) sampleBuffer fromConnection:(AVCaptureConnection *) connection {
 	[self updateCurrentFrameFromSampleBuffer:sampleBuffer];
-	[self updateDominantColorForCurrentFrame];
-	//[self updateColorFromColorCubte];
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self updateDominantColorForCurrentFrame];
+	});
 }
 
 - (void) setupSDK {
@@ -334,30 +335,25 @@ static struct pixel * pixels = NULL;
 	NSRect rect = NSMakeRect(0, 0, cropRect.size.width,cropRect.size.height);
 	self.croppedImageCGFrame = [croppedImage CGImageForProposedRect:&rect context:NULL hints:NULL];
 	
-//	dispatch_async(dispatch_get_main_queue(), ^{
-//		self.croppedImagePreview.image = self.croppedImageFrame;
-//	});
-}
-
-- (void) updateColorFromColorCubte {
-	CCColorCube * cube = [[CCColorCube alloc] init];
-	int flags = 0;
-	flags |= CCAvoidBlack;
-	flags |= CCAvoidWhite;
-	flags |= CCOnlyBrightColors;
-	NSArray * colors = [cube extractColorsFromImage:self.croppedImageFrame flags:flags count:1];
-	if(colors.count > 0) {
-		self.currentColor = colors[0];
-	}
+//	CIContext * ciContext = [CIContext contextWithOptions:nil];
+//	CIImage * ciImage = [CIImage imageWithCGImage:self.croppedImageCGFrame];
+//	CIFilter * filter = [CIFilter filterWithName:@"CICrystallize" keysAndValues:kCIInputImageKey,ciImage,@"inputRadius",@(50),nil];
+//	CIImage * result = [filter outputImage];
+//	self.croppedImageCGFrame = [ciContext createCGImage:result fromRect:result.extent];
+//	self.croppedImageFrame = [[NSImage alloc] initWithCGImage:self.croppedImageCGFrame size:NSMakeSize(image.size.width,image.size.height)];
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
-		self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
+		self.croppedImagePreview.image = self.croppedImageFrame;
 	});
 }
 
 - (void) updateDominantColorForCurrentFrame {
 	NSImage * image = self.croppedImageFrame;
 	CGImageRef cgimage = self.croppedImageCGFrame;
+	
+	if(!image || !cgimage) {
+		return;
+	}
 	
 	if(!pixels) {
 		pixels = (struct pixel *) calloc(1, image.size.width * image.size.height * sizeof(struct pixel));
@@ -366,15 +362,6 @@ static struct pixel * pixels = NULL;
 	NSUInteger red = 0;
 	NSUInteger green = 0;
 	NSUInteger blue = 0;
-	
-	NSUInteger redAccumulator = 0;
-	NSUInteger redCounter = 0;
-	
-	NSUInteger blueAccumulator = 0;
-	NSUInteger blueCounter = 0;
-	
-	NSUInteger greenAccumulator = 0;
-	NSUInteger greenCounter = 0;
 	
 	if(pixels != nil) {
 		CGContextRef context = CGBitmapContextCreate((void*)pixels,image.size.width,image.size.height,8,image.size.width * 4,CGImageGetColorSpace(cgimage),kCGImageAlphaPremultipliedLast);
@@ -385,67 +372,40 @@ static struct pixel * pixels = NULL;
 			
 			for(int i = 0; i < numberOfPixels; i++) {
 				
-				//if(pixels[i].r > 100 && pixels[i].g > 100 && pixels[i].b > 100) {
-				//	continue;
-				//}
-				
-				//red += pixels[i].r;
-				//green += pixels[i].g;
-				//blue += pixels[i].b;
-				
-				NSColor * color = [NSColor colorWithRed:pixels[i].r green:pixels[i].g blue:pixels[i].b alpha:1];
-				
-				CGFloat h,s,b;
-				[color getHue:&h saturation:&s brightness:&b alpha:nil];
-				
-				if(h > .98 || (h > self.orangeRedHue && h < self.yellowHue)) {
-					redAccumulator += pixels[i].r;
-					redCounter++;
+				if(pixels[i].r > 100 && pixels[i].g > 100 && pixels[i].b > 100) {
+					continue;
 				}
 				
-				else if(h > self.yellowHue && h < self.blueGreenHue) {
-					greenAccumulator += pixels[i].g;
-					greenCounter++;
-				}
-				
-				else if(h > self.self.greenHue && h < self.redPurpleHue) {
-					blueAccumulator += pixels[i].b;
-					blueAccumulator++;
-				}
+				red += pixels[i].r;
+				green += pixels[i].g;
+				blue += pixels[i].b;
 				
 			}
 			
-			//red /= numberOfPixels;
-			//green /= numberOfPixels;
-			//blue /= numberOfPixels;
-			
-			if(redCounter > 0) {
-				if(redCounter > blueCounter && redCounter > greenCounter) {
-					red = redAccumulator / redCounter;
-				} else {
-					red = redAccumulator / (redCounter*2);
-				}
+			if(red > green && red > blue) {
+				NSLog(@"more red");
+				green /= 1.3;
+				blue /= 1.3;
 			}
 			
-			if(greenCounter > 0) {
-				if(greenCounter > blueCounter && greenCounter > redCounter) {
-					green = greenAccumulator / greenCounter;
-				} else {
-					green = (greenAccumulator / (greenCounter*2));
-				}
+			if(green > red && green > blue) {
+				NSLog(@"more green");
+				red /= 1.3;
+				blue /= 1.3;
 			}
 			
-			if(blueCounter > 0) {
-				if(blueCounter > greenCounter && blueCounter > redCounter) {
-					blue = blueAccumulator / blueCounter;
-				} else {
-					blue = blueAccumulator / (blueCounter*2);
-				}
+			if(blue > red && blue > green) {
+				NSLog(@"more blue");
+				red /= 1.3;
+				green /= 1.3;
 			}
+			
+			red /= numberOfPixels;
+			green /= numberOfPixels;
+			blue /= numberOfPixels;
 			
 			CGContextRelease(context);
 		}
-		
 		
 		CGFloat h,s,b,a;
 		
@@ -470,15 +430,7 @@ static struct pixel * pixels = NULL;
 
 #pragma mark local connection callbacks
 
-static int _log = 0;
-
 - (void) update {
-	_log++;
-	if(_log == 20) {
-		_log = 0;
-		NSLog(@"update");
-		NSLog(@"current color: %@",self.currentColor);
-	}
 	[self changeHueToColor:self.currentColor];
 }
 
@@ -486,8 +438,6 @@ static int _log = 0;
 	[self.updateIntervalTimer invalidate];
 	
 	self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:self.updateInterval.floatValue target:self selector:@selector(update) userInfo:nil repeats:TRUE];
-	
-	//self.updateIntervalTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f/6.0f target:self selector:@selector(update) userInfo:nil repeats:TRUE];
 	
 	if(self.updateInterval.floatValue == 1 || self.updateInterval.floatValue == 2) {
 		self.updateIntervalLabel.stringValue = [NSString stringWithFormat:@"%li Seconds", self.updateInterval.integerValue];
@@ -523,8 +473,6 @@ static int _log = 0;
 }
 
 - (IBAction) powerToggle:(id) sender {
-	NSLog(@"power toggle");
-	
 	self.lightState = !self.lightState;
 	
 	if(self.lightState) {
@@ -582,13 +530,10 @@ static int _log = 0;
 }
 
 - (void) changeHueToColor:(NSColor *) color {
-	
 	CGFloat h,s,b;
 	[self.currentColor getHue:&h saturation:&s brightness:&b alpha:nil];
 	
 	NSLog(@"change color to: %f %f %f",h,s,b);
-	
-	return;
 	
 	if(!self.canChangeColor || !self.lightState) {
 		return;
