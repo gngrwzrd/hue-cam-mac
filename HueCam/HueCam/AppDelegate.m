@@ -134,6 +134,10 @@ static CGContextRef _context;
 	self.preview.wantsLayer = TRUE;
 	self.preview.layer.zPosition = 5;
 	
+	self.croppedImagePreview.wantsLayer = TRUE;
+	self.croppedImagePreview.layer.borderColor = [[NSColor whiteColor] CGColor];
+	self.croppedImagePreview.layer.borderWidth = 2;
+	
 	self.cropSelector.wantsLayer = TRUE;
 	self.cropSelector.layer.zPosition = 20;
 	
@@ -278,6 +282,9 @@ static CGContextRef _context;
 
 #pragma mark utils
 
+static CIContext * ciContext;
+static CIFilter * ciFilter;
+
 - (void) updateCurrentFrameFromSampleBuffer:(CMSampleBufferRef) sampleBuffer {
 	// Get a CMSampleBuffer's Core Video image buffer for the media data
 	CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
@@ -332,11 +339,35 @@ static CGContextRef _context;
 	self.croppedImageFrame = croppedImage;
 	
 	NSRect rect = NSMakeRect(0, 0, cropRect.size.width,cropRect.size.height);
-	self.croppedImageCGFrame = [croppedImage CGImageForProposedRect:&rect context:NULL hints:NULL];
+	CGImageRef tmpCGImage = [croppedImage CGImageForProposedRect:&rect context:NULL hints:NULL];
+	self.croppedImageCGFrame = tmpCGImage;
 	
-//	dispatch_async(dispatch_get_main_queue(), ^{
-//		self.croppedImagePreview.image = self.croppedImageFrame;
-//	});
+//	CIImage * ciImage = [CIImage imageWithCGImage:tmpCGImage];
+//	
+//	if(!ciContext) {
+//		ciContext = [CIContext contextWithOptions:nil];
+//	}
+//	
+//	if(!ciFilter) {
+//		ciFilter = [CIFilter filterWithName:@"CIColorControls"];
+//	}
+//	
+//	[ciFilter setDefaults];
+//	[ciFilter setValue:ciImage forKey:kCIInputImageKey];
+//	[ciFilter setValue:@(-.2) forKey:kCIInputBrightnessKey];
+//	[ciFilter setValue:@(1.8) forKey:kCIInputSaturationKey];
+//	[ciFilter setValue:@(1.1) forKey:kCIInputContrastKey];
+//	
+//	CIImage * result = [ciFilter outputImage];
+//	self.croppedImageCGFrame = [ciContext createCGImage:result fromRect:result.extent];
+//	
+//	self.croppedImageFrame = [[NSImage alloc] initWithCGImage:self.croppedImageCGFrame size:NSMakeSize(image.size.width,image.size.height)];
+//	
+//	CGImageRelease(self.croppedImageCGFrame);
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		self.croppedImagePreview.image = self.croppedImageFrame;
+	});
 }
 
 - (void) updateAverageColorForCurrentFrame {
@@ -364,13 +395,13 @@ static CGContextRef _context;
 	
 	for(int i = 0; i < numberOfPixels; i++) {
 		
-		if(pixels[i].r > 200 && pixels[i].g > 200 && pixels[i].b > 200) {
+		if(pixels[i].r > 220 && pixels[i].g > 220 && pixels[i].b > 220) {
 			continue;
 		}
 		
-		red += pixels[i].r;
-		green += pixels[i].g;
-		blue += pixels[i].b;
+		red += pixels[i].r * .9;
+		green += pixels[i].g * .9;
+		blue += pixels[i].b * .9;
 		
 	}
 	
@@ -392,16 +423,14 @@ static CGContextRef _context;
 	}
 	
 	self.currentColor = [NSColor colorWithHue:h saturation:s brightness:b alpha:a];
-	
-	dispatch_async(dispatch_get_main_queue(), ^{
-		self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
-	});
 }
 
 #pragma mark local connection callbacks
 
 - (void) update {
 	[self changeHueToColor:self.currentColor];
+	
+	self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
 }
 
 - (IBAction) intervalUpdate:(id) sender {
