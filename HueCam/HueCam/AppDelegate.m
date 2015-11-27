@@ -14,6 +14,7 @@ struct pixel {
 };
 
 static struct pixel * pixels = NULL;
+static CGContextRef _context;
 
 @interface AppDelegate ()
 @property (weak) IBOutlet NSWindow * window;
@@ -195,9 +196,7 @@ static struct pixel * pixels = NULL;
 
 - (void) captureOutput:(AVCaptureOutput *) captureOutput didOutputSampleBuffer:(CMSampleBufferRef) sampleBuffer fromConnection:(AVCaptureConnection *) connection {
 	[self updateCurrentFrameFromSampleBuffer:sampleBuffer];
-	dispatch_async(dispatch_get_main_queue(), ^{
-		[self updateDominantColorForCurrentFrame];
-	});
+	[self updateAverageColorForCurrentFrame];
 }
 
 - (void) setupSDK {
@@ -335,19 +334,12 @@ static struct pixel * pixels = NULL;
 	NSRect rect = NSMakeRect(0, 0, cropRect.size.width,cropRect.size.height);
 	self.croppedImageCGFrame = [croppedImage CGImageForProposedRect:&rect context:NULL hints:NULL];
 	
-//	CIContext * ciContext = [CIContext contextWithOptions:nil];
-//	CIImage * ciImage = [CIImage imageWithCGImage:self.croppedImageCGFrame];
-//	CIFilter * filter = [CIFilter filterWithName:@"CICrystallize" keysAndValues:kCIInputImageKey,ciImage,@"inputRadius",@(50),nil];
-//	CIImage * result = [filter outputImage];
-//	self.croppedImageCGFrame = [ciContext createCGImage:result fromRect:result.extent];
-//	self.croppedImageFrame = [[NSImage alloc] initWithCGImage:self.croppedImageCGFrame size:NSMakeSize(image.size.width,image.size.height)];
-	
-	dispatch_async(dispatch_get_main_queue(), ^{
-		self.croppedImagePreview.image = self.croppedImageFrame;
-	});
+//	dispatch_async(dispatch_get_main_queue(), ^{
+//		self.croppedImagePreview.image = self.croppedImageFrame;
+//	});
 }
 
-- (void) updateDominantColorForCurrentFrame {
+- (void) updateAverageColorForCurrentFrame {
 	NSImage * image = self.croppedImageFrame;
 	CGImageRef cgimage = self.croppedImageCGFrame;
 	
@@ -363,69 +355,47 @@ static struct pixel * pixels = NULL;
 	NSUInteger green = 0;
 	NSUInteger blue = 0;
 	
-	if(pixels != nil) {
-		CGContextRef context = CGBitmapContextCreate((void*)pixels,image.size.width,image.size.height,8,image.size.width * 4,CGImageGetColorSpace(cgimage),kCGImageAlphaPremultipliedLast);
-		if(context != NULL) {
-			
-			CGContextDrawImage(context, CGRectMake(0.0f, 0.0f, image.size.width,image.size.height),cgimage);
-			NSUInteger numberOfPixels = image.size.width * image.size.height;
-			
-			for(int i = 0; i < numberOfPixels; i++) {
-				
-				if(pixels[i].r > 100 && pixels[i].g > 100 && pixels[i].b > 100) {
-					continue;
-				}
-				
-				red += pixels[i].r;
-				green += pixels[i].g;
-				blue += pixels[i].b;
-				
-			}
-			
-			if(red > green && red > blue) {
-				NSLog(@"more red");
-				green /= 1.3;
-				blue /= 1.3;
-			}
-			
-			if(green > red && green > blue) {
-				NSLog(@"more green");
-				red /= 1.3;
-				blue /= 1.3;
-			}
-			
-			if(blue > red && blue > green) {
-				NSLog(@"more blue");
-				red /= 1.3;
-				green /= 1.3;
-			}
-			
-			red /= numberOfPixels;
-			green /= numberOfPixels;
-			blue /= numberOfPixels;
-			
-			CGContextRelease(context);
-		}
-		
-		CGFloat h,s,b,a;
-		
-		NSColor * tmp = [NSColor colorWithRed:red/255.0f green:green/255.0f blue:blue/255.0f alpha:1.0f];
-		[tmp getHue:&h saturation:&s brightness:&b alpha:&a];
-		
-		if(s < self.saturationSlider.floatValue) {
-			s = self.saturationSlider.floatValue;
-		}
-		
-		if(b < self.brightness.floatValue) {
-			b = self.brightness.floatValue;
-		}
-		
-		self.currentColor = [NSColor colorWithHue:h saturation:s brightness:b alpha:a];
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
-		});
+	if(!_context) {
+		_context = CGBitmapContextCreate((void*)pixels,image.size.width,image.size.height,8,image.size.width * 4,CGImageGetColorSpace(cgimage),kCGImageAlphaPremultipliedLast);
 	}
+	
+	CGContextDrawImage(_context, CGRectMake(0.0f, 0.0f, image.size.width,image.size.height),cgimage);
+	NSUInteger numberOfPixels = image.size.width * image.size.height;
+	
+	for(int i = 0; i < numberOfPixels; i++) {
+		
+		if(pixels[i].r > 200 && pixels[i].g > 200 && pixels[i].b > 200) {
+			continue;
+		}
+		
+		red += pixels[i].r;
+		green += pixels[i].g;
+		blue += pixels[i].b;
+		
+	}
+	
+	red /= numberOfPixels;
+	green /= numberOfPixels;
+	blue /= numberOfPixels;
+	
+	CGFloat h,s,b,a;
+	
+	NSColor * tmp = [NSColor colorWithRed:red/255.0f green:green/255.0f blue:blue/255.0f alpha:1.0f];
+	[tmp getHue:&h saturation:&s brightness:&b alpha:&a];
+	
+	if(s < self.saturationSlider.floatValue) {
+		s = self.saturationSlider.floatValue;
+	}
+	
+	if(b < self.brightness.floatValue) {
+		b = self.brightness.floatValue;
+	}
+	
+	self.currentColor = [NSColor colorWithHue:h saturation:s brightness:b alpha:a];
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		self.currentColorView.layer.backgroundColor = [self.currentColor CGColor];
+	});
 }
 
 #pragma mark local connection callbacks
