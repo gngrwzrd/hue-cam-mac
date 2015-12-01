@@ -385,6 +385,7 @@ static NSSize croppedSize;
 	NSUInteger blue = 0;
 	
 	if(!pixels || !NSEqualSizes(croppedSize,image.size)) {
+		
 		if(pixels) {
 			free(pixels);
 		}
@@ -396,6 +397,8 @@ static NSSize croppedSize;
 		}
 		
 		_context = CGBitmapContextCreate((void*)pixels,image.size.width,image.size.height,8,image.size.width * 4,CGImageGetColorSpace(cgimage),kCGImageAlphaPremultipliedLast);
+		
+		croppedSize = image.size;
 	}
 	
 	CGContextDrawImage(_context, CGRectMake(0.0f, 0.0f, image.size.width,image.size.height),cgimage);
