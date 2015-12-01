@@ -370,6 +370,8 @@ static CIFilter * ciFilter;
 	});
 }
 
+static NSSize croppedSize;
+
 - (void) updateAverageColorForCurrentFrame {
 	NSImage * image = self.croppedImageFrame;
 	CGImageRef cgimage = self.croppedImageCGFrame;
@@ -378,7 +380,11 @@ static CIFilter * ciFilter;
 		return;
 	}
 	
-	if(!pixels) {
+	if(!pixels || !NSEqualSizes(croppedSize,image.size)) {
+		if(pixels) {
+			free(pixels);
+		}
+		
 		pixels = (struct pixel *) calloc(1, image.size.width * image.size.height * sizeof(struct pixel));
 	}
 	
