@@ -380,19 +380,21 @@ static NSSize croppedSize;
 		return;
 	}
 	
+	NSUInteger red = 0;
+	NSUInteger green = 0;
+	NSUInteger blue = 0;
+	
 	if(!pixels || !NSEqualSizes(croppedSize,image.size)) {
 		if(pixels) {
 			free(pixels);
 		}
 		
 		pixels = (struct pixel *) calloc(1, image.size.width * image.size.height * sizeof(struct pixel));
-	}
-	
-	NSUInteger red = 0;
-	NSUInteger green = 0;
-	NSUInteger blue = 0;
-	
-	if(!_context) {
+		
+		if(_context) {
+			CGContextRelease(_context);
+		}
+		
 		_context = CGBitmapContextCreate((void*)pixels,image.size.width,image.size.height,8,image.size.width * 4,CGImageGetColorSpace(cgimage),kCGImageAlphaPremultipliedLast);
 	}
 	
