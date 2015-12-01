@@ -230,6 +230,8 @@ static CGContextRef _context;
 	// Register for notifications about pushlinking
 	PHNotificationManager * phNotificationMgr = [PHNotificationManager defaultManager];
 	
+	[phNotificationMgr deregisterObjectForAllNotifications:self];
+	
 	[phNotificationMgr registerObject:self withSelector:@selector(authenticationSuccess) forNotification:PUSHLINK_LOCAL_AUTHENTICATION_SUCCESS_NOTIFICATION];
 	[phNotificationMgr registerObject:self withSelector:@selector(authenticationFailed) forNotification:PUSHLINK_LOCAL_AUTHENTICATION_FAILED_NOTIFICATION];
 	[phNotificationMgr registerObject:self withSelector:@selector(noLocalConnection) forNotification:PUSHLINK_NO_LOCAL_CONNECTION_NOTIFICATION];
@@ -247,6 +249,9 @@ static CGContextRef _context;
 
 - (void) startLocalConnection {
 	PHNotificationManager * notificationManager = [PHNotificationManager defaultManager];
+	
+	[notificationManager deregisterObjectForAllNotifications:self];
+	
 	[notificationManager registerObject:self withSelector:@selector(localConnection) forNotification:LOCAL_CONNECTION_NOTIFICATION];
 	[notificationManager registerObject:self withSelector:@selector(noLocalConnection) forNotification:NO_LOCAL_CONNECTION_NOTIFICATION];
 	[notificationManager registerObject:self withSelector:@selector(notAuthenticated) forNotification:NO_LOCAL_AUTHENTICATION_NOTIFICATION];
